@@ -42,6 +42,7 @@ public class MainActivityFragment extends Fragment {
                 return false;
             }
         });
+
         webView.loadUrl("http://oauth.vk.com/authorize?" +
                 "client_id=" + "4980534" + "&" +
                 "scope=" + "friends,photos" + "&" +
@@ -49,6 +50,7 @@ public class MainActivityFragment extends Fragment {
                 "display=" + "mobile" + "&" +
                 "v=" + "5.34" + "&" +
                 "response_type=token");
+
         return webView;
     }
 }
