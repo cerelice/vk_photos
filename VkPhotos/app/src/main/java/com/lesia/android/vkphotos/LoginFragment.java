@@ -11,9 +11,9 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class MainActivityFragment extends Fragment {
+public class LoginFragment extends Fragment {
 
-    public MainActivityFragment() {
+    public LoginFragment() {
     }
 
     @Override
