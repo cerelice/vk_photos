@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import de.greenrobot.event.EventBus;
+
 public class LoginFragment extends Fragment {
 
     public LoginFragment() {
@@ -37,6 +39,8 @@ public class LoginFragment extends Fragment {
 
                     Log.v("ACCESS_TOKEN", getActivity().getPreferences(Context.MODE_PRIVATE)
                             .getString("ACCESS_TOKEN", "0"));
+
+                    EventBus.getDefault().post(new AuthEvent());
                     return true;
                 }
                 return false;

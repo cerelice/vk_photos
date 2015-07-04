@@ -6,15 +6,31 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
+
 
 public class MainActivity extends ActionBarActivity {
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         if(savedInstanceState == null) {
-            if(getPreferences(Context.MODE_PRIVATE).getString("ACCESS_TOKEN", "0") != "0") {
+            if(!getPreferences(Context.MODE_PRIVATE).getString("ACCESS_TOKEN", "0").equals("0")) {
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragment_container, new FriendListFragment())
@@ -48,5 +64,13 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Subscribe
+    public void onEvent(AuthEvent event) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new FriendListFragment())
+                .commit();
     }
 }
