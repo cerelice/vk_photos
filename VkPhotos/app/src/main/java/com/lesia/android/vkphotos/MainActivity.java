@@ -1,7 +1,6 @@
 package com.lesia.android.vkphotos;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -29,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         if(savedInstanceState == null) {
             if(!getPreferences(Context.MODE_PRIVATE).getString(
                             getString(R.string.access_token_key),

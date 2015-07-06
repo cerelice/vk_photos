@@ -11,4 +11,5 @@
     <string name="expires_in_def_value">0</string>
     <string name="user_id_key">USER_ID</string>
     <string name="user_id_def_value">0</string>
+    <string name="name_and_surname">Ім’я та прізвище</string>
 </resources>
