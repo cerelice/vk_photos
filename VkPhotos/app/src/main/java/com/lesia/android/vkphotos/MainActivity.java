@@ -3,14 +3,14 @@ package com.lesia.android.vkphotos;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import de.greenrobot.event.EventBus;
-import de.greenrobot.event.Subscribe;
-
 
 public class MainActivity extends ActionBarActivity {
+    final String LOG_TAG = "MAIN_ACTIVITY";
 
     @Override
     protected void onStart() {
@@ -30,12 +30,17 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         if(savedInstanceState == null) {
-            if(!getPreferences(Context.MODE_PRIVATE).getString("ACCESS_TOKEN", "0").equals("0")) {
+            if(!getPreferences(Context.MODE_PRIVATE).getString(
+                            getString(R.string.access_token_key),
+                            getString(R.string.access_token_def_value))
+                    .equals(getString(R.string.access_token_def_value))) {
+                Log.v(LOG_TAG, "already have access_token, send to friend list");
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragment_container, new FriendListFragment())
                         .commit();
             } else {
+                Log.v(LOG_TAG, "don't have access_token, send to friend list");
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragment_container, new LoginFragment())
@@ -66,8 +71,8 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Subscribe
     public void onEvent(AuthEvent event) {
+        Log.v(LOG_TAG, "send to friend list after authorization");
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, new FriendListFragment())

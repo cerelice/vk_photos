@@ -5,8 +5,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 public class FriendListFragment extends Fragment {
+    ArrayAdapter<String> arrayAdapter;
 
     public FriendListFragment() {
         // Required empty public constructor
@@ -16,6 +18,8 @@ public class FriendListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_friend_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_friend_list, container, false);
+        return rootView;
     }
+
 }

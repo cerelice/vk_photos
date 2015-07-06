@@ -34,11 +34,14 @@ public class LoginFragment extends Fragment {
 
                     SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("ACCESS_TOKEN", url.substring(begin, end));
+                    editor.putString(getString(R.string.access_token_key), url.substring(begin, end));
                     editor.commit();
 
                     Log.v("ACCESS_TOKEN", getActivity().getPreferences(Context.MODE_PRIVATE)
-                            .getString("ACCESS_TOKEN", "0"));
+                            .getString(
+                                    getString(R.string.access_token_key),
+                                    getString(R.string.access_token_def_value))
+                    );
 
                     EventBus.getDefault().post(new AuthEvent());
                     return true;
