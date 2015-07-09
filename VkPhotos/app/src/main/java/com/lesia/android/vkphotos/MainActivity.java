@@ -78,4 +78,5 @@ public class MainActivity extends ActionBarActivity {
                 .replace(R.id.fragment_container, new FriendListFragment())
                 .commit();
     }
+
 }

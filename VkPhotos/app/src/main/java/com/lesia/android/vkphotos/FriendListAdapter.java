@@ -1,5 +1,6 @@
 package com.lesia.android.vkphotos;
 
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,9 +11,13 @@ import java.util.ArrayList;
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListItemViewHolder>
 {
     private ArrayList<String> mDataset;
+    private Drawable mDw1;
+    private Drawable mDw2;
 
-    public FriendListAdapter(ArrayList<String> Dataset) {
+    public FriendListAdapter(ArrayList<String> Dataset, Drawable dw1, Drawable dw2) {
         mDataset = Dataset;
+        mDw1 = dw1;
+        mDw2 = dw2;
     }
 
     public FriendListItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -26,25 +31,16 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListItemViewHo
     @Override
     public void onBindViewHolder(FriendListItemViewHolder viewHolder, int i) {
         viewHolder.mName.setText(mDataset.get(i));
+        if(i % 2 == 0) {
+            viewHolder.mPhoto.setImageDrawable(mDw1);
+        }
+        else {
+            viewHolder.mPhoto.setImageDrawable(mDw2);
+        }
     }
 
     @Override
     public int getItemCount() {
         return mDataset.size();
-    }
-
-    public ArrayList<String> getDataset() { return mDataset; }
-
-    public void addItem(String n) {
-        mDataset.add(n);
-        notifyItemInserted(mDataset.size()-1);
-    }
-
-    public void removeAll() {
-        int size = mDataset.size();
-        for(int i = 0; i < size; i++) {
-            mDataset.remove(0);
-            notifyItemRemoved(0);
-        }
     }
 }
