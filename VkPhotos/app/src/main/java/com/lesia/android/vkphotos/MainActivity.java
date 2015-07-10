@@ -47,6 +47,7 @@ public class MainActivity extends ActionBarActivity {
                         .commit();
             }
         }
+        //Log.v("test", ((VkPhotosApplication)getApplicationContext()).TEST);
     }
 
     @Override
