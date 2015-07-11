@@ -80,4 +80,13 @@ public class MainActivity extends ActionBarActivity {
                 .commit();
     }
 
+    public void onEvent(OpenAlbumsFragmentEvent event) {
+        Log.v(LOG_TAG, "send to albums list onclick");
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container, new AlbumsFragment(), "AlbumsFragment")
+                .addToBackStack("AlbumsFragment")
+                .commit();
+    }
+
 }

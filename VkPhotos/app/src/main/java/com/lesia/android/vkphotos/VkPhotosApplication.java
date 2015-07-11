@@ -13,28 +13,26 @@ import retrofit.client.Response;
  */
 public class VkPhotosApplication extends Application
 {
-    private IVkApi vkApi;
+    private static final String LOG_TAG = "APPLICATION";
 
     @Override
     public void onCreate() {
         super.onCreate();
-       // IVkApi vkApi = ;
         EventBus.getDefault().register(this);
     }
 
-    public void onEvent(String access_token)
+    public void onEvent(LoadFriendListEvent event)
     {
-        new RestClient().getApiService().getFriendsList(access_token, new Callback<FriendListResponse>() {
+        new RestClient().getApiService().getFriendsList(event.getAccessToken(), new Callback<FriendListResponse>() {
             @Override
             public void success(FriendListResponse friends, Response response) {
-                Log.v("CHECK", "SUCCESS");
-                Log.v("RESTOFIT", friends.getResponse().toString());
+                Log.v(LOG_TAG, "Success: " + friends.getResponse().toString());
                 EventBus.getDefault().post(friends);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.v("CHECK", "FAILURE" + error.getMessage());
+                Log.v(LOG_TAG, "Failure: " + error.getMessage());
             }
         });
     }

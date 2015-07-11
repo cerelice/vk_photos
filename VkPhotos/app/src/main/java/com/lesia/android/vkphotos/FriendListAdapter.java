@@ -10,25 +10,28 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
+import de.greenrobot.event.EventBus;
+
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListItemViewHolder>
 {
-    private ArrayList<Friend> mDataset;
+    private ArrayList<Friend> dataSet;
     private Context context;
-    /*
-    private Drawable mDw1;
-    private Drawable mDw2;
-    */
 
-    public FriendListAdapter(ArrayList<Friend> Dataset, Context context) {
-        mDataset = Dataset;
+    public FriendListAdapter(ArrayList<Friend> dataSet, Context context) {
+        this.dataSet = dataSet;
         this.context = context;
-        //mDw1 = dw1;
-        //mDw2 = dw2;
     }
 
-    public FriendListItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public FriendListItemViewHolder onCreateViewHolder(ViewGroup viewGroup, final int i) {
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.list_item_friend, viewGroup, false);
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new OpenAlbumsFragmentEvent(dataSet.get(i).getID()));
+            }
+        });
 
         FriendListItemViewHolder vh = new FriendListItemViewHolder(v);
         return vh;
@@ -36,26 +39,19 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListItemViewHo
 
     @Override
     public void onBindViewHolder(FriendListItemViewHolder viewHolder, int i) {
-        viewHolder.mName.setText(mDataset.get(i).getFullName());
-        Glide.with(context).load(mDataset.get(i).getPhotoUrl()).into(viewHolder.mPhoto);
-        /*
-        if(i % 2 == 0) {
-            viewHolder.mPhoto.setImageDrawable(mDw1);
-        }
-        else {
-            viewHolder.mPhoto.setImageDrawable(mDw2);
-        }
-        */
+        viewHolder.mName.setText(dataSet.get(i).getFullName());
+        Glide.with(context).load(dataSet.get(i).getPhotoUrl()).into(viewHolder.mPhoto);
+
     }
 
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        return dataSet.size();
     }
 
     public void addAll(ArrayList<Friend> newFriends)
     {
-        mDataset.addAll(0, newFriends);
+        dataSet.addAll(dataSet.size(), newFriends);
         notifyDataSetChanged();
     }
 }

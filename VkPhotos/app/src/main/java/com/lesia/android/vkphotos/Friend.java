@@ -16,6 +16,13 @@ public class Friend
     @SerializedName("uid")
     private String mID;
 
+    public Friend() {
+        mName = "";
+        mSurname = "";
+        mPhotoUrl = "";
+        mID = "";
+    }
+
     public String getID() {
         return mID;
     }
@@ -30,11 +37,6 @@ public class Friend
 
     public void setSurname(String mSurname) {
         this.mSurname = mSurname;
-    }
-
-    public Friend() {
-        mName = "";
-        mPhotoUrl = "";
     }
 
     public String getName() {
