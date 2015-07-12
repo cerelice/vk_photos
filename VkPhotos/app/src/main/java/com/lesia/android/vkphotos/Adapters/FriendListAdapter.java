@@ -1,4 +1,4 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.Adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.lesia.android.vkphotos.Models.Friend;
+import com.lesia.android.vkphotos.ViewHolders.FriendListItemViewHolder;
+import com.lesia.android.vkphotos.Events.OpenAlbumsFragmentEvent;
+import com.lesia.android.vkphotos.R;
 
 import java.util.ArrayList;
 

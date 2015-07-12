@@ -1,4 +1,4 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.Adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -7,12 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.lesia.android.vkphotos.Models.Photo;
+import com.lesia.android.vkphotos.ViewHolders.PhotoCardViewHolder;
+import com.lesia.android.vkphotos.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by lesia on 7/12/15.
- */
 public class PhotoCardAdapter extends RecyclerView.Adapter<PhotoCardViewHolder>
 {
     private ArrayList<Photo> dataSet;
@@ -27,7 +27,12 @@ public class PhotoCardAdapter extends RecyclerView.Adapter<PhotoCardViewHolder>
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.card_photo, viewGroup, false);
 
-        PhotoCardViewHolder vh = new PhotoCardViewHolder(v);
+        PhotoCardViewHolder vh = new PhotoCardViewHolder(v, new PhotoCardViewHolder.IListener() {
+            @Override
+            public void onClick(int pos) {
+
+            }
+        });
         return vh;
     }
 

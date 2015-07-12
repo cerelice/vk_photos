@@ -1,4 +1,4 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.Events;
 
 /**
  * Created by lesia on 7/11/15.

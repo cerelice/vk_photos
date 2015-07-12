@@ -1,4 +1,4 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.UI;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,17 +6,22 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.lesia.android.vkphotos.Adapters.FriendListAdapter;
+import com.lesia.android.vkphotos.Events.LoadFriendListEvent;
+import com.lesia.android.vkphotos.Models.Friend;
+import com.lesia.android.vkphotos.Models.FriendListResponse;
+import com.lesia.android.vkphotos.R;
 
 import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
 
 public class FriendListFragment extends Fragment {
-    FriendListAdapter adapter;
+    private FriendListAdapter adapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -43,7 +48,6 @@ public class FriendListFragment extends Fragment {
                 getString(R.string.access_token_key),
                 getString(R.string.access_token_def_value)
         );
-        Log.v("ACCESS_TOKEN", access_token);
         EventBus.getDefault().post(new LoadFriendListEvent(access_token));
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.friendListRecyclerView);
@@ -55,8 +59,8 @@ public class FriendListFragment extends Fragment {
         return rootView;
     }
 
-    public void onEvent(FriendListResponse response)
+    public void onEvent(FriendListResponse friends)
     {
-        adapter.addAll(response.getResponse());
+        adapter.addAll(friends.getResponse());
     }
 }

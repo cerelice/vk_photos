@@ -1,4 +1,4 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.UI;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -7,10 +7,41 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.lesia.android.vkphotos.Events.AuthEvent;
+import com.lesia.android.vkphotos.Events.OpenAlbumsFragmentEvent;
+import com.lesia.android.vkphotos.Events.OpenPhotosFromAlbumEvent;
+import com.lesia.android.vkphotos.R;
+
 import de.greenrobot.event.EventBus;
 
 public class MainActivity extends ActionBarActivity {
     final String LOG_TAG = "MAIN_ACTIVITY";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        String pref_access_token = getPreferences(Context.MODE_PRIVATE).getString(
+                getString(R.string.access_token_key),
+                getString(R.string.access_token_def_value)
+        );
+        String access_token_def_value = getString(R.string.access_token_def_value);
+        if(!pref_access_token.equals(access_token_def_value)) {
+            Log.v(LOG_TAG, "Already have access_token, send to friend list");
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new FriendListFragment())
+                    .commit();
+        } else {
+            Log.v(LOG_TAG, "Don't have access_token, send to friend list");
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new LoginFragment())
+                    .commit();
+        }
+    }
 
     @Override
     protected void onStart() {
@@ -22,33 +53,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onStop() {
         EventBus.getDefault().unregister(this);
         super.onStop();
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        getSupportActionBar().setHomeButtonEnabled(true);
-
-        if(savedInstanceState == null) {
-            if(!getPreferences(Context.MODE_PRIVATE).getString(
-                            getString(R.string.access_token_key),
-                            getString(R.string.access_token_def_value))
-                    .equals(getString(R.string.access_token_def_value))) {
-                Log.v(LOG_TAG, "already have access_token, send to friend list");
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, new FriendListFragment())
-                        .commit();
-            } else {
-                Log.v(LOG_TAG, "don't have access_token, send to friend list");
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, new LoginFragment())
-                        .commit();
-            }
-        }
-        //Log.v("test", ((VkPhotosApplication)getApplicationContext()).TEST);
     }
 
     @Override
@@ -66,7 +70,8 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if(id == R.id.home) {
+        if(id == android.R.id.home) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             onBackPressed();
             return true;
         }
@@ -78,7 +83,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void onEvent(AuthEvent event) {
-        Log.v(LOG_TAG, "send to friend list after authorization");
+        Log.v(LOG_TAG, "Send to friend list after authorization");
         FriendListFragment fragment = new FriendListFragment();
         getSupportFragmentManager()
                 .beginTransaction()
@@ -87,30 +92,37 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void onEvent(OpenAlbumsFragmentEvent event) {
-        Log.v(LOG_TAG, "send to albums list onclick");
+        Log.v(LOG_TAG, "Send to albums list onclick");
+
         Bundle bundle = new Bundle();
         bundle.putString("OWNER_ID", event.getOwnerId());
         AlbumsFragment fragment = new AlbumsFragment();
         fragment.setArguments(bundle);
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment, fragment.getClass().getSimpleName())
                 .addToBackStack(fragment.getClass().getSimpleName())
                 .commit();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public void onEvent(OpenPhotosFromAlbumEvent event) {
-        Log.v(LOG_TAG, "send to photos from album onclick");
+        Log.v(LOG_TAG, "Send to photos from album onclick");
+
         Bundle bundle = new Bundle();
         bundle.putString("OWNER_ID", event.getOwnerId());
         bundle.putString("ALBUM_ID", event.getAlbumId());
         AlbumPhotoFragment fragment = new AlbumPhotoFragment();
         fragment.setArguments(bundle);
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment, fragment.getClass().getSimpleName())
                 .addToBackStack(fragment.getClass().getSimpleName())
                 .commit();
-    }
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 }

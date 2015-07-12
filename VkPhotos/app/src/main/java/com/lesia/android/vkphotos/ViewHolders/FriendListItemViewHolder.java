@@ -1,24 +1,26 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.ViewHolders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.lesia.android.vkphotos.R;
+
 /**
- * Created by lesia on 7/11/15.
+ * Created by lesia on 7/6/15.
  */
-public class AlbumCardViewHolder extends RecyclerView.ViewHolder
+public class FriendListItemViewHolder extends RecyclerView.ViewHolder
 {
-    public ImageView mCoverPhoto;
+    public ImageView mPhoto;
     public TextView mName;
     public IListener mListener;
 
-    public AlbumCardViewHolder(View itemView, IListener listener) {
+    public FriendListItemViewHolder(View itemView, IListener listener) {
         super(itemView);
 
-        mCoverPhoto = (ImageView) itemView.findViewById(R.id.albumCoverImageView);
-        mName = (TextView) itemView.findViewById(R.id.albumNameTextView);
+        mPhoto = (ImageView) itemView.findViewById(R.id.photoImageView);
+        mName = (TextView) itemView.findViewById(R.id.nameTextView);
         mListener = listener;
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,4 +1,4 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.UI;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,6 +8,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.lesia.android.vkphotos.Adapters.AlbumCardAdapter;
+import com.lesia.android.vkphotos.Models.Album;
+import com.lesia.android.vkphotos.Models.AlbumsResponse;
+import com.lesia.android.vkphotos.Events.LoadAlbumListEvent;
+import com.lesia.android.vkphotos.R;
 
 import java.util.ArrayList;
 
@@ -36,7 +42,9 @@ public class AlbumsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView =  inflater.inflate(R.layout.fragment_albums, container, false);
-        EventBus.getDefault().post(new LoadAlbumListEvent(getArguments().getString("OWNER_ID")));
+
+        String owner_id = getArguments().getString("OWNER_ID");
+        EventBus.getDefault().post(new LoadAlbumListEvent(owner_id));
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.albumsRecyclerView);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
@@ -47,9 +55,7 @@ public class AlbumsFragment extends Fragment {
         return rootView;
     }
 
-    public void onEvent(AlbumsResponse albumsResponse)
-    {
-        adapter.addAll(albumsResponse.getResponse());
+    public void onEvent(AlbumsResponse albums) {
+        adapter.addAll(albums.getResponse());
     }
-
 }

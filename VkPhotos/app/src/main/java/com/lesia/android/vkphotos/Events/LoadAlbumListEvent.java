@@ -1,13 +1,12 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.Events;
 
 /**
  * Created by lesia on 7/11/15.
  */
-public class OpenAlbumsFragmentEvent
-{
+public class LoadAlbumListEvent {
     private String owner_id;
 
-    public OpenAlbumsFragmentEvent(String owner_id) {
+    public LoadAlbumListEvent(String owner_id) {
         this.owner_id = owner_id;
     }
 

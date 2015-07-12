@@ -1,7 +1,14 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.RestUtils;
 
 import android.app.Application;
 import android.util.Log;
+
+import com.lesia.android.vkphotos.Models.AlbumsResponse;
+import com.lesia.android.vkphotos.Events.LoadAlbumListEvent;
+import com.lesia.android.vkphotos.Events.LoadFriendListEvent;
+import com.lesia.android.vkphotos.Events.LoadPhotoListEvent;
+import com.lesia.android.vkphotos.Models.FriendListResponse;
+import com.lesia.android.vkphotos.Models.PhotoListResponse;
 
 import de.greenrobot.event.EventBus;
 import retrofit.Callback;

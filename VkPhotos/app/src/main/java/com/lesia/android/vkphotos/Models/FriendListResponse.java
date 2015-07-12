@@ -1,4 +1,4 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.Models;
 
 import com.google.gson.annotations.SerializedName;
 

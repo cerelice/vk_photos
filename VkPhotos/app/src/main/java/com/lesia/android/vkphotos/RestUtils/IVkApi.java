@@ -1,4 +1,8 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.RestUtils;
+
+import com.lesia.android.vkphotos.Models.AlbumsResponse;
+import com.lesia.android.vkphotos.Models.FriendListResponse;
+import com.lesia.android.vkphotos.Models.PhotoListResponse;
 
 import retrofit.Callback;
 import retrofit.http.GET;

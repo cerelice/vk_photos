@@ -1,4 +1,4 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.UI;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -9,12 +9,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.lesia.android.vkphotos.Adapters.PhotoCardAdapter;
+import com.lesia.android.vkphotos.Events.LoadPhotoListEvent;
+import com.lesia.android.vkphotos.Models.Photo;
+import com.lesia.android.vkphotos.Models.PhotoListResponse;
+import com.lesia.android.vkphotos.R;
+
 import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
 
 public class AlbumPhotoFragment extends Fragment {
-    PhotoCardAdapter adapter;
+    private PhotoCardAdapter adapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -37,6 +43,7 @@ public class AlbumPhotoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_album_photo, container, false);
+
         EventBus.getDefault().post(new LoadPhotoListEvent(
                 getArguments().getString("OWNER_ID"),
                 getArguments().getString("ALBUM_ID")
@@ -51,8 +58,8 @@ public class AlbumPhotoFragment extends Fragment {
         return rootView;
     }
 
-    public void onEvent(PhotoListResponse event)
+    public void onEvent(PhotoListResponse photos)
     {
-        adapter.addAll(event.getResponse());
+        adapter.addAll(photos.getResponse());
     }
 }

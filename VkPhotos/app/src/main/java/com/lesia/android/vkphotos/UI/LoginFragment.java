@@ -1,4 +1,4 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.UI;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.lesia.android.vkphotos.Events.AuthEvent;
+import com.lesia.android.vkphotos.R;
 
 import de.greenrobot.event.EventBus;
 
@@ -31,14 +34,6 @@ public class LoginFragment extends Fragment {
                 final String USER_ID = "user_id";
 
                 if(url.contains(ACCESS_TOKEN)) {
-                    /*
-                    int begin_access_token = url.indexOf(ACCESS_TOKEN) + ACCESS_TOKEN.length();
-                    int end_access_token = url.indexOf(EXPIRES_IN);
-                    int begin_expires_in = end_access_token + EXPIRES_IN.length();
-                    int end_expires_in = url.indexOf(USER_ID);
-                    int begin_user_id = end_expires_in + USER_ID.length();
-                    int end_user_id = url.length() - 1;
-                    */
                     url = url.replace('#', '?');
                     Uri uri = Uri.parse(url);
                     Log.v("URI", url);
@@ -48,17 +43,14 @@ public class LoginFragment extends Fragment {
                     editor.putString(
                             getString(R.string.access_token_key),
                             uri.getQueryParameter(ACCESS_TOKEN)
-                            //url.substring(begin_access_token, end_access_token)
                     );
                     editor.putString(
                             getString(R.string.expires_in_key),
                             uri.getQueryParameter(EXPIRES_IN)
-                            //url.substring(begin_expires_in, end_expires_in)
                     );
                     editor.putString(
                             getString(R.string.user_id_key),
                             uri.getQueryParameter(USER_ID)
-                            //url.substring(begin_user_id, end_user_id)
                     );
                     editor.commit();
 

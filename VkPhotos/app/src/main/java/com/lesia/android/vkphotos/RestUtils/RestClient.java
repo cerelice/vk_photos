@@ -1,7 +1,8 @@
-package com.lesia.android.vkphotos;
+package com.lesia.android.vkphotos.RestUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.lesia.android.vkphotos.RestUtils.IVkApi;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
