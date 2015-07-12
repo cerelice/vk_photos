@@ -12,4 +12,17 @@ public interface IVkApi
             @Query("access_token") String access_token,
             Callback<FriendListResponse> friendList
     );
+
+    @GET("/photos.get?rev=0")
+    public void getPhotos(
+            @Query("owner_id") String owner_id,
+            @Query("album_id") String album_id,
+            Callback<PhotoListResponse> photoList
+    );
+
+    @GET("/photos.getAlbums?need_covers=1&need_system=1")
+    public void getAlbums(
+            @Query("owner_id") String owner_id,
+            Callback<AlbumsResponse> albumList
+    );
 }

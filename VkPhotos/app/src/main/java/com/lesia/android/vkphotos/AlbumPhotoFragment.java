@@ -13,8 +13,8 @@ import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
 
-public class AlbumsFragment extends Fragment {
-    AlbumCardAdapter adapter;
+public class AlbumPhotoFragment extends Fragment {
+    PhotoCardAdapter adapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -28,28 +28,31 @@ public class AlbumsFragment extends Fragment {
         super.onDetach();
     }
 
-    public AlbumsFragment() {
+    public AlbumPhotoFragment() {
         // Required empty public constructor
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView =  inflater.inflate(R.layout.fragment_albums, container, false);
-        EventBus.getDefault().post(new LoadAlbumListEvent(getArguments().getString("OWNER_ID")));
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.fragment_album_photo, container, false);
+        EventBus.getDefault().post(new LoadPhotoListEvent(
+                getArguments().getString("OWNER_ID"),
+                getArguments().getString("ALBUM_ID")
+        ));
 
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.albumsRecyclerView);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
+        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.photosRecyclerView);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 3);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new AlbumCardAdapter(new ArrayList<Album>(), getActivity());
+        adapter = new PhotoCardAdapter(new ArrayList<Photo>(), getActivity());
         recyclerView.setAdapter(adapter);
 
         return rootView;
     }
 
-    public void onEvent(AlbumsResponse albumsResponse)
+    public void onEvent(PhotoListResponse event)
     {
-        adapter.addAll(albumsResponse.getResponse());
+        adapter.addAll(event.getResponse());
     }
-
 }

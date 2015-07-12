@@ -26,14 +26,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListItemViewHo
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.list_item_friend, viewGroup, false);
 
-        v.setOnClickListener(new View.OnClickListener() {
+        FriendListItemViewHolder vh = new FriendListItemViewHolder(v, new FriendListItemViewHolder.IListener() {
             @Override
-            public void onClick(View v) {
-                EventBus.getDefault().post(new OpenAlbumsFragmentEvent(dataSet.get(i).getID()));
+            public void onClick(int pos) {
+                EventBus.getDefault().post(new OpenAlbumsFragmentEvent(dataSet.get(pos).getID()));
             }
         });
-
-        FriendListItemViewHolder vh = new FriendListItemViewHolder(v);
         return vh;
     }
 

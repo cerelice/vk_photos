@@ -37,6 +37,38 @@ public class VkPhotosApplication extends Application
         });
     }
 
+    public void onEvent(LoadAlbumListEvent event)
+    {
+        new RestClient().getApiService().getAlbums(event.getOwnerId(), new Callback<AlbumsResponse>() {
+            @Override
+            public void success(AlbumsResponse albums, Response response) {
+                Log.v(LOG_TAG, "Success: " + albums.getResponse().toString());
+                EventBus.getDefault().post(albums);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.v(LOG_TAG, "Failure: " + error.getMessage());
+            }
+        });
+    }
+
+    public void onEvent(LoadPhotoListEvent event)
+    {
+        new RestClient().getApiService().getPhotos(event.getOwnerId(), event.getAlbumId(), new Callback<PhotoListResponse>() {
+            @Override
+            public void success(PhotoListResponse photos, Response response) {
+                Log.v(LOG_TAG, "Success: " + photos.getResponse().toString());
+                EventBus.getDefault().post(photos);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.v(LOG_TAG, "Failure: " + error.getMessage());
+            }
+        });
+    }
+
     @Override
     public void onTerminate() {
         EventBus.getDefault().unregister(this);

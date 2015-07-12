@@ -28,6 +28,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         if(savedInstanceState == null) {
             if(!getPreferences(Context.MODE_PRIVATE).getString(
@@ -65,6 +66,10 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        if(id == R.id.home) {
+            onBackPressed();
+            return true;
+        }
         if (id == R.id.action_settings) {
             return true;
         }
@@ -74,18 +79,37 @@ public class MainActivity extends ActionBarActivity {
 
     public void onEvent(AuthEvent event) {
         Log.v(LOG_TAG, "send to friend list after authorization");
+        FriendListFragment fragment = new FriendListFragment();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, new FriendListFragment())
+                .replace(R.id.fragment_container, fragment, fragment.getClass().getSimpleName())
                 .commit();
     }
 
     public void onEvent(OpenAlbumsFragmentEvent event) {
         Log.v(LOG_TAG, "send to albums list onclick");
+        Bundle bundle = new Bundle();
+        bundle.putString("OWNER_ID", event.getOwnerId());
+        AlbumsFragment fragment = new AlbumsFragment();
+        fragment.setArguments(bundle);
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragment_container, new AlbumsFragment(), "AlbumsFragment")
-                .addToBackStack("AlbumsFragment")
+                .replace(R.id.fragment_container, fragment, fragment.getClass().getSimpleName())
+                .addToBackStack(fragment.getClass().getSimpleName())
+                .commit();
+    }
+
+    public void onEvent(OpenPhotosFromAlbumEvent event) {
+        Log.v(LOG_TAG, "send to photos from album onclick");
+        Bundle bundle = new Bundle();
+        bundle.putString("OWNER_ID", event.getOwnerId());
+        bundle.putString("ALBUM_ID", event.getAlbumId());
+        AlbumPhotoFragment fragment = new AlbumPhotoFragment();
+        fragment.setArguments(bundle);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment, fragment.getClass().getSimpleName())
+                .addToBackStack(fragment.getClass().getSimpleName())
                 .commit();
     }
 
