@@ -2,6 +2,8 @@ package com.lesia.android.vkphotos.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 /**
  * Created by lesia on 7/11/15.
  */
@@ -15,6 +17,16 @@ public class Album
     private String mID;
     @SerializedName("owner_id")
     private String mOwnerID;
+    @SerializedName("sizes")
+    private ArrayList<SpecialPhoto> photos;
+
+    public ArrayList<SpecialPhoto> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(ArrayList<SpecialPhoto> photos) {
+        this.photos = photos;
+    }
 
     public String getPhotoUrl() {
         return mPhotoUrl;
@@ -55,6 +67,7 @@ public class Album
                 ", mName='" + mName + '\'' +
                 ", mID='" + mID + '\'' +
                 ", mOwnerID='" + mOwnerID + '\'' +
+                ", photos=" + photos +
                 '}';
     }
 }

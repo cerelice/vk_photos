@@ -7,11 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.lesia.android.vkphotos.events.OpenSinglePhotoFragmentEvent;
 import com.lesia.android.vkphotos.models.Photo;
+import com.lesia.android.vkphotos.models.PhotoListResponse;
 import com.lesia.android.vkphotos.view_holders.PhotoCardViewHolder;
 import com.lesia.android.vkphotos.R;
 
 import java.util.ArrayList;
+
+import de.greenrobot.event.EventBus;
 
 public class PhotoCardAdapter extends RecyclerView.Adapter<PhotoCardViewHolder>
 {
@@ -30,7 +34,12 @@ public class PhotoCardAdapter extends RecyclerView.Adapter<PhotoCardViewHolder>
         PhotoCardViewHolder vh = new PhotoCardViewHolder(v, new PhotoCardViewHolder.IListener() {
             @Override
             public void onClick(int pos) {
-
+                EventBus.getDefault().post(
+                        new OpenSinglePhotoFragmentEvent(
+                                new PhotoListResponse(dataSet),
+                                pos
+                        )
+                );
             }
         });
         return vh;

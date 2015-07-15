@@ -24,7 +24,7 @@ public interface IVkApi
             Callback<PhotoListResponse> photoList
     );
 
-    @GET("/photos.getAlbums?need_covers=1&need_system=1")
+    @GET("/photos.getAlbums?need_covers=1&need_system=1&photo_sizes=1")
     public void getAlbums(
             @Query("owner_id") String owner_id,
             Callback<AlbumsResponse> albumList

@@ -1,16 +1,19 @@
 package com.lesia.android.vkphotos.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.lesia.android.vkphotos.R;
 import com.lesia.android.vkphotos.events.AuthEvent;
 import com.lesia.android.vkphotos.events.OpenAlbumsFragmentEvent;
 import com.lesia.android.vkphotos.events.OpenPhotosFromAlbumEvent;
-import com.lesia.android.vkphotos.R;
+import com.lesia.android.vkphotos.events.OpenSinglePhotoFragmentEvent;
+import com.lesia.android.vkphotos.models.PhotoListResponse;
 
 import de.greenrobot.event.EventBus;
 
@@ -119,6 +122,16 @@ public class MainActivity extends ActionBarActivity {
                 .replace(R.id.fragment_container, fragment, fragment.getClass().getSimpleName())
                 .addToBackStack(fragment.getClass().getSimpleName())
                 .commit();
+    }
+
+    public void onEvent(OpenSinglePhotoFragmentEvent event) {
+        Intent intent = new Intent(this, SinglePhotoActivity.class);
+        Bundle bundle = new Bundle();
+        PhotoListResponse photos = event.getPhotos();
+        bundle.putSerializable("PHOTOS", photos);
+        bundle.putInt("POSITION", event.getPosition());
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     public void setUpNavigation(boolean b)

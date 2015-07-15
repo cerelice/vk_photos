@@ -7,10 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
-import com.lesia.android.vkphotos.models.Album;
-import com.lesia.android.vkphotos.view_holders.AlbumCardViewHolder;
-import com.lesia.android.vkphotos.events.OpenPhotosFromAlbumEvent;
 import com.lesia.android.vkphotos.R;
+import com.lesia.android.vkphotos.events.OpenPhotosFromAlbumEvent;
+import com.lesia.android.vkphotos.models.Album;
+import com.lesia.android.vkphotos.models.SpecialPhoto;
+import com.lesia.android.vkphotos.view_holders.AlbumCardViewHolder;
 
 import java.util.ArrayList;
 
@@ -48,7 +49,15 @@ public class AlbumCardAdapter extends RecyclerView.Adapter<AlbumCardViewHolder>
     @Override
     public void onBindViewHolder(AlbumCardViewHolder viewHolder, int i) {
         viewHolder.mName.setText(dataSet.get(i).getName());
-        Glide.with(context).load(dataSet.get(i).getPhotoUrl()).centerCrop().into(viewHolder.mCoverPhoto);
+        ArrayList<SpecialPhoto> photos = dataSet.get(i).getPhotos();
+        String photo_url = null;
+        for(SpecialPhoto photo : photos) {
+            if(photo.getType().equals("x")) {
+                photo_url = photo.getSrc();
+                break;
+            }
+        }
+        Glide.with(context).load(photo_url).centerCrop().into(viewHolder.mCoverPhoto);
     }
 
     @Override

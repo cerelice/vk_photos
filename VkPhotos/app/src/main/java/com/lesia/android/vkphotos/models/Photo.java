@@ -2,59 +2,61 @@ package com.lesia.android.vkphotos.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by lesia on 7/11/15.
  */
-public class Photo
+public class Photo implements Serializable
 {
-    @SerializedName("src")
-    private String mPhotoUrl;
+    @SerializedName("src_big")
+    private String photoUrl;
     @SerializedName("pid")
-    private String mID;
+    private String id;
     @SerializedName("owner_id")
-    private String mOwnerID;
+    private String ownerID;
     @SerializedName("aid")
-    private String mAlbumID;
+    private String albumID;
 
     public String getPhotoUrl() {
-        return mPhotoUrl;
+        return photoUrl;
     }
 
     public void setPhotoUrl(String mPhotoUrl) {
-        this.mPhotoUrl = mPhotoUrl;
+        this.photoUrl = mPhotoUrl;
     }
 
-    public String getID() {
-        return mID;
+    public String getId() {
+        return id;
     }
 
-    public void setID(String mID) {
-        this.mID = mID;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getOwnerID() {
-        return mOwnerID;
+        return ownerID;
     }
 
     public void setOwnerID(String mOwnerID) {
-        this.mOwnerID = mOwnerID;
+        this.ownerID = mOwnerID;
     }
 
     public String getAlbumID() {
-        return mAlbumID;
+        return albumID;
     }
 
     public void setAlbumID(String mAlbumID) {
-        this.mAlbumID = mAlbumID;
+        this.albumID = mAlbumID;
     }
 
     @Override
     public String toString() {
         return "Photo{" +
-                "mPhotoUrl='" + mPhotoUrl + '\'' +
-                ", mID='" + mID + '\'' +
-                ", mOwnerID='" + mOwnerID + '\'' +
-                ", mAlbumID='" + mAlbumID + '\'' +
+                "photoUrl='" + photoUrl + '\'' +
+                ", id='" + id + '\'' +
+                ", ownerID='" + ownerID + '\'' +
+                ", albumID='" + albumID + '\'' +
                 '}';
     }
 }
