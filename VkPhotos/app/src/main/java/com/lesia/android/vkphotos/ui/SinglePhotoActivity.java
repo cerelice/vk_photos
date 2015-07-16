@@ -1,7 +1,11 @@
 package com.lesia.android.vkphotos.ui;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -21,6 +25,10 @@ import android.view.Window;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.lesia.android.vkphotos.R;
 import com.lesia.android.vkphotos.models.Photo;
 import com.lesia.android.vkphotos.models.PhotoListResponse;
@@ -103,6 +111,9 @@ public class SinglePhotoActivity extends ActionBarActivity {
 
     public static class PlaceholderFragment extends Fragment {
         private static final String ARG_PHOTO_URL = "photo_url";
+        private ImageView singlePhotoImageView;
+        private Bitmap photo;
+        private Uri uri;
         private static final String MESSAGE_TEXT = "Checkout this photo! ";
 
         public static PlaceholderFragment newInstance(String photo_url) {
@@ -122,24 +133,40 @@ public class SinglePhotoActivity extends ActionBarActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_single_photo, container, false);
             String photo_url = getArguments().getString(ARG_PHOTO_URL);
-            ImageView singlePhotoImageView = (ImageView) rootView.findViewById(R.id.singlePhotoImageView);
+            singlePhotoImageView = (ImageView) rootView.findViewById(R.id.singlePhotoImageView);
             singlePhotoImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    boolean isVisible = ((SinglePhotoActivity)getActivity()).isActionBarVisible();
-                    ((SinglePhotoActivity)getActivity()).setActionBarVisibility(!isVisible);
+                    boolean isVisible = ((SinglePhotoActivity) getActivity()).isActionBarVisible();
+                    ((SinglePhotoActivity) getActivity()).setActionBarVisibility(!isVisible);
                 }
             });
-            Glide.with(this).load(photo_url).into(singlePhotoImageView);
+            Glide.with(this).load(photo_url).into(new BitmapImageViewTarget(singlePhotoImageView) {
+                @Override
+                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    super.onResourceReady(resource, glideAnimation);
+                    String path = MediaStore.Images.Media.insertImage(
+                            getActivity().getContentResolver(),
+                            resource,
+                            "Cool photo",
+                            null
+                    );
+                    uri = Uri.parse(path);
+                }
+                }
+            );
+
             return rootView;
         }
 
         private Intent createShareIntent()
         {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-            shareIntent.setType("text/plain");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, MESSAGE_TEXT + getArguments().getString(ARG_PHOTO_URL));
+            shareIntent.setType("image/*");
+            //Bitmap photo = ((BitmapDrawable)singlePhotoImageView.getDrawable()).getBitmap();
+
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            //shareIntent.putExtra(Intent.EXTRA_TEXT, MESSAGE_TEXT + getArguments().getString(ARG_PHOTO_URL));
 
             return shareIntent;
         }
