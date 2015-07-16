@@ -59,4 +59,17 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListItemViewHo
         dataSet.addAll(dataSet.size(), newFriends);
         notifyDataSetChanged();
     }
+
+    public void replaceAll(ArrayList<Friend> newFriends)
+    {
+        dataSet.clear();
+        dataSet.addAll(dataSet.size(), newFriends);
+        notifyDataSetChanged();
+    }
+
+
+    public void setDataSet(ArrayList<Friend> dataSet) {
+        this.dataSet = dataSet;
+        notifyDataSetChanged();
+    }
 }
