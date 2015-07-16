@@ -7,10 +7,11 @@
 
     <style name="transparentTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="actionBarStyle">@style/MyActionBar</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar">
-        <item name="background">@android:color/transparent</item>
+        <item name="background">@drawable/gradient</item>
         <item name="windowActionBarOverlay">true</item>
     </style>
 

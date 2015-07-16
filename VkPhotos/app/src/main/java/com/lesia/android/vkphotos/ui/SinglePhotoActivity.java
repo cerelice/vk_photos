@@ -37,6 +37,7 @@ public class SinglePhotoActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        getSupportActionBar().setElevation(0);
         setContentView(R.layout.activity_single_photo);
 
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
@@ -47,6 +48,17 @@ public class SinglePhotoActivity extends ActionBarActivity {
         mViewPager.setCurrentItem(position);
     }
 
+    public boolean isActionBarVisible() {
+        return getSupportActionBar().isShowing();
+    }
+
+    public void setActionBarVisibility(boolean b) {
+        if(b) {
+            getSupportActionBar().show();
+        } else {
+            getSupportActionBar().hide();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -111,6 +123,13 @@ public class SinglePhotoActivity extends ActionBarActivity {
             View rootView = inflater.inflate(R.layout.fragment_single_photo, container, false);
             String photo_url = getArguments().getString(ARG_PHOTO_URL);
             ImageView singlePhotoImageView = (ImageView) rootView.findViewById(R.id.singlePhotoImageView);
+            singlePhotoImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean isVisible = ((SinglePhotoActivity)getActivity()).isActionBarVisible();
+                    ((SinglePhotoActivity)getActivity()).setActionBarVisibility(!isVisible);
+                }
+            });
             Glide.with(this).load(photo_url).into(singlePhotoImageView);
             return rootView;
         }
