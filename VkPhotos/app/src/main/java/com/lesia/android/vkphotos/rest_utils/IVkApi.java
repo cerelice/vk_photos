@@ -17,7 +17,7 @@ public interface IVkApi
             Callback<FriendListResponse> friendList
     );
 
-    @GET("/photos.get?rev=0")
+    @GET("/photos.get?rev=1")
     public void getPhotos(
             @Query("owner_id") String owner_id,
             @Query("album_id") String album_id,

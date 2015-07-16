@@ -14,23 +14,14 @@ public class AlbumCardViewHolder extends RecyclerView.ViewHolder
 {
     public ImageView mCoverPhoto;
     public TextView mName;
-    public IListener mListener;
+    public View rootView;
 
-    public AlbumCardViewHolder(View itemView, IListener listener) {
+    public AlbumCardViewHolder(View itemView) {
         super(itemView);
 
         mCoverPhoto = (ImageView) itemView.findViewById(R.id.albumCoverImageView);
         mName = (TextView) itemView.findViewById(R.id.albumNameTextView);
-        mListener = listener;
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onClick(getPosition());
-            }
-        });
+        rootView = itemView;
     }
 
-    public interface IListener {
-        void onClick(int pos);
-    }
 }

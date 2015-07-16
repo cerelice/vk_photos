@@ -30,26 +30,29 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListItemViewHo
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.list_item_friend, viewGroup, false);
 
-        FriendListItemViewHolder vh = new FriendListItemViewHolder(v, new FriendListItemViewHolder.IListener() {
-            @Override
-            public void onClick(int pos) {
-                EventBus.getDefault().post(new OpenAlbumsFragmentEvent(dataSet.get(pos).getID()));
-            }
-        });
+        FriendListItemViewHolder vh = new FriendListItemViewHolder(v);
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(FriendListItemViewHolder viewHolder, int i) {
-        viewHolder.mName.setText(dataSet.get(i).getFullName());
-        Glide.with(context).load(dataSet.get(i).getPhotoUrl()).into(viewHolder.mPhoto);
-
+    public void onBindViewHolder(final FriendListItemViewHolder viewHolder, final int position) {
+        viewHolder.mName.setText(dataSet.get(position).getFullName());
+        Glide.with(context).load(dataSet.get(position).getPhotoUrl()).into(viewHolder.mPhoto);
+        viewHolder.rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new OpenAlbumsFragmentEvent(dataSet.get(position).getID()));
+            }
+        });
     }
+
 
     @Override
     public int getItemCount() {
         return dataSet.size();
     }
+
+
 
     public void addAll(ArrayList<Friend> newFriends)
     {

@@ -12,22 +12,12 @@ import com.lesia.android.vkphotos.R;
 public class PhotoCardViewHolder extends RecyclerView.ViewHolder
 {
     public ImageView mPhoto;
-    public IListener mListener;
+    public View rootView;
 
-    public PhotoCardViewHolder(View itemView, IListener listener) {
+    public PhotoCardViewHolder(View itemView) {
         super(itemView);
 
         mPhoto = (ImageView) itemView.findViewById(R.id.photoImageView);
-        mListener = listener;
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onClick(getPosition());
-            }
-        });
-    }
-
-    public interface IListener {
-        void onClick(int pos);
+        rootView = itemView;
     }
 }

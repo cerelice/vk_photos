@@ -1,14 +1,19 @@
 package com.lesia.android.vkphotos.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,6 +91,7 @@ public class SinglePhotoActivity extends ActionBarActivity {
 
     public static class PlaceholderFragment extends Fragment {
         private static final String ARG_PHOTO_URL = "photo_url";
+        private static final String MESSAGE_TEXT = "Checkout this photo! ";
 
         public static PlaceholderFragment newInstance(String photo_url) {
             PlaceholderFragment fragment = new PlaceholderFragment();
@@ -96,6 +102,7 @@ public class SinglePhotoActivity extends ActionBarActivity {
         }
 
         public PlaceholderFragment() {
+            setHasOptionsMenu(true);
         }
 
         @Override
@@ -106,6 +113,31 @@ public class SinglePhotoActivity extends ActionBarActivity {
             ImageView singlePhotoImageView = (ImageView) rootView.findViewById(R.id.singlePhotoImageView);
             Glide.with(this).load(photo_url).into(singlePhotoImageView);
             return rootView;
+        }
+
+        private Intent createShareIntent()
+        {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, MESSAGE_TEXT + getArguments().getString(ARG_PHOTO_URL));
+
+            return shareIntent;
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            inflater.inflate(R.menu.menu_single_photo_fragment, menu);
+
+            MenuItem menuItem = menu.findItem(R.id.action_share);
+
+            ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+            if(mShareActionProvider != null) {
+                mShareActionProvider.setShareIntent(createShareIntent());
+            }
+            else {
+                Log.d("SHARE", "Share Action Provider is null");
+            }
         }
     }
 

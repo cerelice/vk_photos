@@ -31,23 +31,24 @@ public class PhotoCardAdapter extends RecyclerView.Adapter<PhotoCardViewHolder>
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.card_photo, viewGroup, false);
 
-        PhotoCardViewHolder vh = new PhotoCardViewHolder(v, new PhotoCardViewHolder.IListener() {
-            @Override
-            public void onClick(int pos) {
-                EventBus.getDefault().post(
-                        new OpenSinglePhotoFragmentEvent(
-                                new PhotoListResponse(dataSet),
-                                pos
-                        )
-                );
-            }
-        });
+        PhotoCardViewHolder vh = new PhotoCardViewHolder(v);
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(PhotoCardViewHolder viewHolder, int i) {
-        Glide.with(context).load(dataSet.get(i).getPhotoUrl()).centerCrop().into(viewHolder.mPhoto);
+    public void onBindViewHolder(final PhotoCardViewHolder viewHolder, final int position) {
+        viewHolder.rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(
+                        new OpenSinglePhotoFragmentEvent(
+                                new PhotoListResponse(dataSet),
+                                position
+                        )
+                );
+            }
+        });
+        Glide.with(context).load(dataSet.get(position).getPhotoUrl()).centerCrop().into(viewHolder.mPhoto);
     }
 
     @Override

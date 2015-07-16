@@ -34,22 +34,25 @@ public class AlbumCardAdapter extends RecyclerView.Adapter<AlbumCardViewHolder>
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.card_album, viewGroup, false);
 
-        AlbumCardViewHolder vh = new AlbumCardViewHolder(v, new AlbumCardViewHolder.IListener() {
-            @Override
-            public void onClick(int pos) {
-                EventBus.getDefault().post(new OpenPhotosFromAlbumEvent(
-                        dataSet.get(pos).getOwnerID(),
-                        dataSet.get(pos).getID()
-                ));
-            }
-        });
+        AlbumCardViewHolder vh = new AlbumCardViewHolder(v);
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(AlbumCardViewHolder viewHolder, int i) {
-        viewHolder.mName.setText(dataSet.get(i).getName());
-        ArrayList<SpecialPhoto> photos = dataSet.get(i).getPhotos();
+    public void onBindViewHolder(AlbumCardViewHolder viewHolder, final int position) {
+        viewHolder.mName.setText(dataSet.get(position).getName());
+
+        viewHolder.rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new OpenPhotosFromAlbumEvent(
+                        dataSet.get(position).getOwnerID(),
+                        dataSet.get(position).getID()
+                ));
+            }
+        });
+
+        ArrayList<SpecialPhoto> photos = dataSet.get(position).getPhotos();
         String photo_url = null;
         for(SpecialPhoto photo : photos) {
             if(photo.getType().equals("x")) {

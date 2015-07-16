@@ -14,23 +14,13 @@ public class FriendListItemViewHolder extends RecyclerView.ViewHolder
 {
     public ImageView mPhoto;
     public TextView mName;
-    public IListener mListener;
+    public View rootView;
 
-    public FriendListItemViewHolder(View itemView, IListener listener) {
+    public FriendListItemViewHolder(View itemView) {
         super(itemView);
 
         mPhoto = (ImageView) itemView.findViewById(R.id.photoImageView);
         mName = (TextView) itemView.findViewById(R.id.nameTextView);
-        mListener = listener;
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onClick(getPosition());
-            }
-        });
-    }
-
-    public interface IListener {
-        void onClick(int pos);
+        rootView = itemView;
     }
 }
