@@ -73,4 +73,11 @@ public class AlbumCardAdapter extends RecyclerView.Adapter<AlbumCardViewHolder>
         dataSet.addAll(dataSet.size(), newAlbums);
         notifyDataSetChanged();
     }
+
+    public void replaceAll(ArrayList<Album> newAlbums)
+    {
+        dataSet.clear();
+        dataSet.addAll(dataSet.size(), newAlbums);
+        notifyDataSetChanged();
+    }
 }

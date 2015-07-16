@@ -58,7 +58,7 @@ public class FriendListFragment extends Fragment {
         adapter = new FriendListAdapter(new ArrayList<Friend>(), getActivity());
         recyclerView.setAdapter(adapter);
 
-        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
+        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.friendSwipeContainer);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
