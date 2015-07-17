@@ -2,10 +2,8 @@ package com.lesia.android.vkphotos.ui;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -25,10 +23,6 @@ import android.view.Window;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.lesia.android.vkphotos.R;
 import com.lesia.android.vkphotos.models.Photo;
 import com.lesia.android.vkphotos.models.PhotoListResponse;
@@ -141,20 +135,7 @@ public class SinglePhotoActivity extends ActionBarActivity {
                     ((SinglePhotoActivity) getActivity()).setActionBarVisibility(!isVisible);
                 }
             });
-            Glide.with(this).load(photo_url).into(new BitmapImageViewTarget(singlePhotoImageView) {
-                @Override
-                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                    super.onResourceReady(resource, glideAnimation);
-                    String path = MediaStore.Images.Media.insertImage(
-                            getActivity().getContentResolver(),
-                            resource,
-                            "Cool photo",
-                            null
-                    );
-                    uri = Uri.parse(path);
-                }
-                }
-            );
+            Glide.with(this).load(photo_url).into(singlePhotoImageView);
 
             return rootView;
         }
@@ -162,11 +143,11 @@ public class SinglePhotoActivity extends ActionBarActivity {
         private Intent createShareIntent()
         {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("image/*");
+            shareIntent.setType("text/plain");
             //Bitmap photo = ((BitmapDrawable)singlePhotoImageView.getDrawable()).getBitmap();
 
-            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-            //shareIntent.putExtra(Intent.EXTRA_TEXT, MESSAGE_TEXT + getArguments().getString(ARG_PHOTO_URL));
+            //shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, MESSAGE_TEXT + getArguments().getString(ARG_PHOTO_URL));
 
             return shareIntent;
         }
