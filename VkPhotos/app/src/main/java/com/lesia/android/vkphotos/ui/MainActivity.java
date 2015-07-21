@@ -13,7 +13,6 @@ import com.lesia.android.vkphotos.events.AuthEvent;
 import com.lesia.android.vkphotos.events.OpenAlbumsFragmentEvent;
 import com.lesia.android.vkphotos.events.OpenPhotosFromAlbumEvent;
 import com.lesia.android.vkphotos.events.OpenSinglePhotoFragmentEvent;
-import com.lesia.android.vkphotos.models.PhotoListResponse;
 
 import de.greenrobot.event.EventBus;
 
@@ -126,12 +125,20 @@ public class MainActivity extends ActionBarActivity {
 
     public void onEvent(OpenSinglePhotoFragmentEvent event) {
         Intent intent = new Intent(this, SinglePhotoActivity.class);
+
         Bundle bundle = new Bundle();
-        PhotoListResponse photos = event.getPhotos();
-        bundle.putSerializable("PHOTOS", photos);
-        bundle.putInt("POSITION", event.getPosition());
+        bundle.putSerializable(OpenSinglePhotoFragmentEvent.PHOTOS_TAG, event.getPhotos());
+        bundle.putInt(OpenSinglePhotoFragmentEvent.POSITION_TAG, event.getPosition());
+        bundle.putInt(OpenSinglePhotoFragmentEvent.ORIENTATION_TAG, event.getOrientation());
+        bundle.putInt(OpenSinglePhotoFragmentEvent.LEFT_LOCATION_TAG, event.getLeftLocation());
+        bundle.putInt(OpenSinglePhotoFragmentEvent.TOP_LOCATION_TAG, event.getTopLocation());
+        bundle.putInt(OpenSinglePhotoFragmentEvent.WIDTH_TAG, event.getWidth());
+        bundle.putInt(OpenSinglePhotoFragmentEvent.HEIGHT_TAG, event.getHeight());
         intent.putExtras(bundle);
+
         startActivity(intent);
+
+        overridePendingTransition(0, 0);
     }
 
     public void setUpNavigation(boolean b)

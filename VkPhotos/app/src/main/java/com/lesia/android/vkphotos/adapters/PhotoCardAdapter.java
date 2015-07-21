@@ -7,11 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.lesia.android.vkphotos.R;
 import com.lesia.android.vkphotos.events.OpenSinglePhotoFragmentEvent;
 import com.lesia.android.vkphotos.models.Photo;
 import com.lesia.android.vkphotos.models.PhotoListResponse;
 import com.lesia.android.vkphotos.view_holders.PhotoCardViewHolder;
-import com.lesia.android.vkphotos.R;
 
 import java.util.ArrayList;
 
@@ -40,10 +40,18 @@ public class PhotoCardAdapter extends RecyclerView.Adapter<PhotoCardViewHolder>
         viewHolder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int[] screenLocation = new int[2];
+                viewHolder.mPhoto.getLocationOnScreen(screenLocation);
+                int orientation = context.getResources().getConfiguration().orientation;
                 EventBus.getDefault().post(
                         new OpenSinglePhotoFragmentEvent(
                                 new PhotoListResponse(dataSet),
-                                position
+                                position,
+                                orientation,
+                                screenLocation[0],
+                                screenLocation[1],
+                                viewHolder.mPhoto.getWidth(),
+                                viewHolder.mPhoto.getHeight()
                         )
                 );
             }
