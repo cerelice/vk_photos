@@ -38,7 +38,10 @@ public class LoginFragment extends Fragment {
                     Uri uri = Uri.parse(url);
                     Log.v("URI", url);
                     Log.v("URI", uri.getQueryParameterNames().toString());
-                    SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences(
+                            getString(R.string.shared_pref_file_name),
+                            Context.MODE_PRIVATE
+                    );
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(
                             getString(R.string.access_token_key),
@@ -54,18 +57,15 @@ public class LoginFragment extends Fragment {
                     );
                     editor.apply();
 
-                    Log.v("ACCESS_TOKEN", getActivity().getPreferences(Context.MODE_PRIVATE)
-                                    .getString(
-                                            getString(R.string.access_token_key),
-                                            getString(R.string.access_token_def_value))
+                    Log.v("ACCESS_TOKEN", sharedPreferences.getString(
+                                    getString(R.string.access_token_key),
+                                    getString(R.string.access_token_def_value))
                     );
-                    Log.v("EXPIRES_IN", getActivity().getPreferences(Context.MODE_PRIVATE)
-                                    .getString(
-                                            getString(R.string.expires_in_key),
-                                            getString(R.string.expires_in_def_value))
+                    Log.v("EXPIRES_IN", sharedPreferences.getString(
+                                    getString(R.string.expires_in_key),
+                                    getString(R.string.expires_in_def_value))
                     );
-                    Log.v("USER_ID", getActivity().getPreferences(Context.MODE_PRIVATE)
-                                    .getString(
+                    Log.v("USER_ID", sharedPreferences.getString(
                                             getString(R.string.user_id_key),
                                             getString(R.string.user_id_def_value))
                     );
@@ -78,7 +78,7 @@ public class LoginFragment extends Fragment {
 
         webView.loadUrl("http://oauth.vk.com/authorize?" +
                 "client_id=" + "4980534" + "&" +
-                "scope=" + "friends,photos,offline" + "&" +
+                "scope=" + "friends,photos,offline,wall" + "&" +
                 "redirect_uri=" + "https://oauth.vk.com/blank.html" + "&" +
                 "display=" + "mobile" + "&" +
                 "v=" + "5.34" + "&" +

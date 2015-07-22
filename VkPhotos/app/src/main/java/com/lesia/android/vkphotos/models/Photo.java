@@ -17,6 +17,48 @@ public class Photo implements Serializable
     private String ownerID;
     @SerializedName("aid")
     private String albumID;
+    @SerializedName("likes")
+    private Likes likes;
+
+    public static class Likes implements Serializable
+    {
+        @SerializedName("user_likes")
+        private int userLikes;
+        @SerializedName("count")
+        private int count;
+
+        public int getUserLikes() {
+            return userLikes;
+        }
+
+        public void setUserLikes(int userLikes) {
+            this.userLikes = userLikes;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+
+        @Override
+        public String toString() {
+            return "Likes{" +
+                    "userLikes=" + userLikes +
+                    ", count=" + count +
+                    '}';
+        }
+    }
+
+    public Likes getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Likes likes) {
+        this.likes = likes;
+    }
 
     public String getPhotoUrl() {
         return photoUrl;
@@ -57,6 +99,7 @@ public class Photo implements Serializable
                 ", id='" + id + '\'' +
                 ", ownerID='" + ownerID + '\'' +
                 ", albumID='" + albumID + '\'' +
+                ", likes=" + likes +
                 '}';
     }
 }

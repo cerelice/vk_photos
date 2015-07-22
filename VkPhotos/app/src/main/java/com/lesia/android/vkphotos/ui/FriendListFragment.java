@@ -46,10 +46,14 @@ public class FriendListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_friend_list, container, false);
         ((MainActivity)getActivity()).setUpNavigation(false);
-        String access_token = getActivity().getPreferences(Context.MODE_PRIVATE).getString(
-                getString(R.string.access_token_key),
-                getString(R.string.access_token_def_value)
-        );
+        String access_token = getActivity().getSharedPreferences(
+                    getString(R.string.shared_pref_file_name),
+                    Context.MODE_PRIVATE
+                )
+                .getString(
+                        getString(R.string.access_token_key),
+                        getString(R.string.access_token_def_value)
+                );
         EventBus.getDefault().post(new LoadFriendListEvent(access_token));
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.friendListRecyclerView);

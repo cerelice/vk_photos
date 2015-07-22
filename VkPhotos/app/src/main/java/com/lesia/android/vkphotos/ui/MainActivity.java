@@ -25,10 +25,14 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        String pref_access_token = getPreferences(Context.MODE_PRIVATE).getString(
-                getString(R.string.access_token_key),
-                getString(R.string.access_token_def_value)
-        );
+        String pref_access_token = getSharedPreferences(
+                    getString(R.string.shared_pref_file_name),
+                    Context.MODE_PRIVATE
+                )
+                .getString(
+                    getString(R.string.access_token_key),
+                    getString(R.string.access_token_def_value)
+                );
         String access_token_def_value = getString(R.string.access_token_def_value);
         if(!pref_access_token.equals(access_token_def_value)) {
             Log.v(LOG_TAG, "Already have access_token, send to friend list");

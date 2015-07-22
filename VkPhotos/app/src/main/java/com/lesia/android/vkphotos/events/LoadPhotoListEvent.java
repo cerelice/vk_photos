@@ -6,10 +6,20 @@ package com.lesia.android.vkphotos.events;
 public class LoadPhotoListEvent {
     private String owner_id;
     private String album_id;
+    private String access_token;
 
-    public LoadPhotoListEvent(String owner_id, String album_id) {
+    public LoadPhotoListEvent(String owner_id, String album_id, String access_token) {
         this.owner_id = owner_id;
         this.album_id = album_id;
+        this.access_token = access_token;
+    }
+
+    public String getAccessToken() {
+        return access_token;
+    }
+
+    public void setAccessToken(String access_token) {
+        this.access_token = access_token;
     }
 
     public String getOwnerId() {

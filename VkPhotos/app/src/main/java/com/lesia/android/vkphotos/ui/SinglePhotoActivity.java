@@ -2,9 +2,10 @@ package com.lesia.android.vkphotos.ui;
 
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -28,16 +29,22 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.lesia.android.vkphotos.R;
+import com.lesia.android.vkphotos.events.AddLikeEvent;
+import com.lesia.android.vkphotos.events.DeleteLikeEvent;
+import com.lesia.android.vkphotos.events.LikeCountChangedEvent;
 import com.lesia.android.vkphotos.events.OpenSinglePhotoFragmentEvent;
 import com.lesia.android.vkphotos.models.Photo;
 import com.lesia.android.vkphotos.models.PhotoListResponse;
 
 import java.util.ArrayList;
+
+import de.greenrobot.event.EventBus;
 
 public class SinglePhotoActivity extends ActionBarActivity {
 
@@ -122,6 +129,12 @@ public class SinglePhotoActivity extends ActionBarActivity {
             photos = ((PhotoListResponse) getIntent()
                     .getSerializableExtra(OpenSinglePhotoFragmentEvent.PHOTOS_TAG))
                     .getResponse();
+
+            String access_token = getPreferences(Context.MODE_PRIVATE).getString(
+                    getString(R.string.access_token_key),
+                    getString(R.string.access_token_def_value)
+            );
+            Log.v("ACTIVITY access_token", access_token);
         }
 
 
@@ -132,8 +145,11 @@ public class SinglePhotoActivity extends ActionBarActivity {
                 animation = PlaceholderFragment.DONT_CREATE_ANIMATION;
             }
             return PlaceholderFragment.newInstance(
+                    photos.get(position),
                     photos.get(position).getPhotoUrl(),
                     animation,
+                    photos.get(position).getLikes().getCount(),
+                    photos.get(position).getLikes().getUserLikes(),
                     getIntent().getExtras()
                     );
         }
@@ -146,9 +162,12 @@ public class SinglePhotoActivity extends ActionBarActivity {
 
     public static class PlaceholderFragment extends Fragment {
         private static final String ARG_PHOTO_URL = "photo_url";
+        private static final String ARG_PHOTO = "photo";
         private static final String ARG_ANIMATION = "animation";
+        private static final String ARG_LIKES = "likes";
+        private static final String ARG_IS_LIKED = "is_liked";
         private ImageView singlePhotoImageView;
-        private Bitmap photo;
+        private Photo photo;
         private Uri uri;
         private static final String MESSAGE_TEXT = "Checkout this photo! ";
         int mLeftDelta;
@@ -157,6 +176,10 @@ public class SinglePhotoActivity extends ActionBarActivity {
         float mHeightScale;
         private FrameLayout mTopLevelLayout;
         private ColorDrawable mBackground;
+        private Button likeButton;
+        String access_token;
+
+        private int mLikesCount;
 
         private static final TimeInterpolator sDecelerator = new DecelerateInterpolator();
         private static final TimeInterpolator sAccelerator = new AccelerateInterpolator();
@@ -164,14 +187,31 @@ public class SinglePhotoActivity extends ActionBarActivity {
         public static final int CREATE_ANIMATION = 1;
         public static int DONT_CREATE_ANIMATION = 0;
 
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            EventBus.getDefault().register(this);
+        }
 
-        public static PlaceholderFragment newInstance(String photo_url,
+        @Override
+        public void onDetach() {
+            EventBus.getDefault().unregister(this);
+            super.onDetach();
+        }
+
+        public static PlaceholderFragment newInstance(Photo photo,
+                                                      String photo_url,
                                                       int animation,
+                                                      int likes,
+                                                      int isLiked,
                                                       Bundle bundle) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putString(ARG_PHOTO_URL, photo_url);
             args.putInt(ARG_ANIMATION, animation);
+            args.putInt(ARG_LIKES, likes);
+            args.putInt(ARG_IS_LIKED, isLiked);
+            args.putSerializable(ARG_PHOTO, photo);
             args.putAll(bundle);
             fragment.setArguments(args);
             return fragment;
@@ -185,7 +225,51 @@ public class SinglePhotoActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_single_photo, container, false);
-            final String photo_url = getArguments().getString(ARG_PHOTO_URL);
+
+            photo = (Photo) getArguments().getSerializable(ARG_PHOTO);
+            mLikesCount = photo.getLikes().getCount();
+            access_token = getActivity().getSharedPreferences(
+                    getString(R.string.shared_pref_file_name),
+                    Context.MODE_PRIVATE
+            )
+                    .getString(
+                            getString(R.string.access_token_key),
+                            getString(R.string.access_token_def_value)
+                    );
+            Log.v("access_token", access_token);
+            final String photo_url = //getArguments().getString(ARG_PHOTO_URL);
+                    photo.getPhotoUrl();
+            likeButton = (Button) rootView.findViewById(R.id.likeButton);
+            //if(getArguments().getInt(ARG_IS_LIKED) == 1) {
+            if(photo.getLikes().getUserLikes() == 1) {
+                likeButton.setText("LIKED " + //getArguments().getInt(ARG_LIKES));
+                        mLikesCount);
+                likeButton.setBackgroundColor(Color.BLUE);
+                likeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EventBus.getDefault().post(new DeleteLikeEvent(
+                                photo.getOwnerID(),
+                                photo.getId(),
+                                access_token
+                        ));
+                    }
+                });
+            } else {
+                likeButton.setText("LIKE " + //getArguments().getInt(ARG_LIKES));
+                        mLikesCount);
+                likeButton.setBackgroundColor(Color.BLACK);
+                likeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EventBus.getDefault().post(new AddLikeEvent(
+                                photo.getOwnerID(),
+                                photo.getId(),
+                                access_token
+                        ));
+                    }
+                });
+            }
             singlePhotoImageView = (ImageView) rootView.findViewById(R.id.singlePhotoImageView);
             singlePhotoImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -233,6 +317,51 @@ public class SinglePhotoActivity extends ActionBarActivity {
             return rootView;
         }
 
+        public void onEvent(LikeCountChangedEvent event) {
+            mLikesCount = event.getLikesCount();
+            Log.v("LikeCountChangedEvent", "likes: " + event.toString());
+            if(event.getAction() == LikeCountChangedEvent.ADD_LIKE) {
+                likeButton.setText("LIKED " + mLikesCount);
+                likeButton.setBackgroundColor(Color.BLUE);
+
+                Photo.Likes likes = new Photo.Likes();
+                likes.setCount(mLikesCount);
+                likes.setUserLikes(event.getAction());
+                photo.setLikes(likes);
+
+                likeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EventBus.getDefault().post(new DeleteLikeEvent(
+                                photo.getOwnerID(),
+                                photo.getId(),
+                                access_token
+                        ));
+                    }
+                });
+            }
+            if(event.getAction() == LikeCountChangedEvent.DELETE_LIKE) {
+                likeButton.setText("LIKE " + mLikesCount);
+                likeButton.setBackgroundColor(Color.BLACK);
+
+                Photo.Likes likes = new Photo.Likes();
+                likes.setCount(mLikesCount);
+                likes.setUserLikes(event.getAction());
+                photo.setLikes(likes);
+
+                likeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EventBus.getDefault().post(new AddLikeEvent(
+                                photo.getOwnerID(),
+                                photo.getId(),
+                                access_token
+                        ));
+                    }
+                });
+            }
+        }
+
         private void runEnterAnimation() {
             long duration = 500;
 
@@ -242,8 +371,8 @@ public class SinglePhotoActivity extends ActionBarActivity {
                                 "setTranslationY = " + mTopDelta
             );
 
-            singlePhotoImageView.setPivotX(0f);
-            singlePhotoImageView.setPivotY(0f);
+            singlePhotoImageView.setPivotX(0.5f);
+            singlePhotoImageView.setPivotY(0.5f);
             singlePhotoImageView.setScaleX(mWidthScale);
             singlePhotoImageView.setScaleY(mWidthScale);
             singlePhotoImageView.setTranslationX(mLeftDelta);

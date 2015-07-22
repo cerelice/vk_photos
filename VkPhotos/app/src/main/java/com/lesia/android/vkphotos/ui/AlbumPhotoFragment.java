@@ -1,6 +1,7 @@
 package com.lesia.android.vkphotos.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -48,9 +49,18 @@ public class AlbumPhotoFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_album_photo, container, false);
         ((MainActivity)getActivity()).setUpNavigation(true);
 
+        String access_token = getActivity().getSharedPreferences(
+                        getString(R.string.shared_pref_file_name),
+                        Context.MODE_PRIVATE
+                )
+                .getString(
+                        getString(R.string.access_token_key),
+                        getString(R.string.access_token_def_value)
+                );
         EventBus.getDefault().post(new LoadPhotoListEvent(
                 getArguments().getString("OWNER_ID"),
-                getArguments().getString("ALBUM_ID")
+                getArguments().getString("ALBUM_ID"),
+                access_token
         ));
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.photosRecyclerView);
