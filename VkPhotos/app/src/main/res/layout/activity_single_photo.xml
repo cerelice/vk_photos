@@ -1,7 +1,15 @@
-<android.support.v4.view.ViewPager
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/pager"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.lesia.android.vkphotos.ui.SinglePhotoActivity" />
+    tools:context="com.lesia.android.vkphotos.ui.SinglePhotoActivity"
+    android:id="@+id/single_photo_container">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+</FrameLayout>

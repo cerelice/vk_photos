@@ -6,10 +6,14 @@ import android.util.Log;
 import com.lesia.android.vkphotos.events.AddLikeEvent;
 import com.lesia.android.vkphotos.events.DeleteLikeEvent;
 import com.lesia.android.vkphotos.events.LikeCountChangedEvent;
+import com.lesia.android.vkphotos.events.LoadCommentsEvent;
+import com.lesia.android.vkphotos.events.LoadUserInfoEvent;
 import com.lesia.android.vkphotos.models.AlbumsResponse;
 import com.lesia.android.vkphotos.events.LoadAlbumListEvent;
 import com.lesia.android.vkphotos.events.LoadFriendListEvent;
 import com.lesia.android.vkphotos.events.LoadPhotoListEvent;
+import com.lesia.android.vkphotos.models.Comment;
+import com.lesia.android.vkphotos.models.CommentListResponse;
 import com.lesia.android.vkphotos.models.FriendListResponse;
 import com.lesia.android.vkphotos.models.LikeResponse;
 import com.lesia.android.vkphotos.models.PhotoListResponse;
@@ -49,6 +53,23 @@ public class VkPhotosApplication extends Application
         });
     }
 
+    public void onEvent(LoadUserInfoEvent event)
+    {
+        apiService.getUserInfo(event.getUserID(), new Callback<FriendListResponse>() {
+            @Override
+            public void success(FriendListResponse friends, Response response) {
+                Log.v(LOG_TAG, "Success: " + friends.getResponse().toString());
+
+                EventBus.getDefault().post(friends.getResponse().get(0));
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.v(LOG_TAG, "Failure: " + error.getMessage());
+            }
+        });
+    }
+
     public void onEvent(LoadAlbumListEvent event)
     {
         apiService.getAlbums(event.getOwnerId(), new Callback<AlbumsResponse>() {
@@ -72,6 +93,37 @@ public class VkPhotosApplication extends Application
             public void success(PhotoListResponse photos, Response response) {
                 Log.v(LOG_TAG, "Success: " + photos.getResponse().toString());
                 EventBus.getDefault().post(photos);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.v(LOG_TAG, "Failure: " + error.getMessage());
+            }
+        });
+    }
+
+    public void onEvent(LoadCommentsEvent event)
+    {
+        apiService.getComments(event.getOwnerID(), event.getPhotoID(), event.getAccessToken(), new Callback<CommentListResponse>() {
+            @Override
+            public void success(CommentListResponse comments, Response response) {
+                Log.v(LOG_TAG, "Success: " + comments.getResponse().getItems().toString());
+                for(final Comment comment : comments.getResponse().getItems()) {
+                    apiService.getUserInfo(comment.getId(), new Callback<FriendListResponse>() {
+                        @Override
+                        public void success(FriendListResponse friends, Response response) {
+                            Log.v(LOG_TAG, "Success: " + friends.getResponse().toString());
+                            comment.setFullName(friends.getResponse().get(0).getFullName());
+                            comment.setPhotoUrl(friends.getResponse().get(0).getPhotoUrl());
+                        }
+
+                        @Override
+                        public void failure(RetrofitError error) {
+                            Log.v(LOG_TAG, "Failure: " + error.getMessage());
+                        }
+                    });
+                }
+                EventBus.getDefault().post(comments);
             }
 
             @Override

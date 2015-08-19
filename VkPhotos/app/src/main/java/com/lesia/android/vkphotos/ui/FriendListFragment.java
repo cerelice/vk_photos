@@ -1,13 +1,19 @@
 package com.lesia.android.vkphotos.ui;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -38,12 +44,13 @@ public class FriendListFragment extends Fragment {
     }
 
     public FriendListFragment() {
-        // Required empty public constructor
+        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View rootView = inflater.inflate(R.layout.fragment_friend_list, container, false);
         ((MainActivity)getActivity()).setUpNavigation(false);
         String access_token = getActivity().getSharedPreferences(
@@ -66,7 +73,10 @@ public class FriendListFragment extends Fragment {
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                String access_token = getActivity().getPreferences(Context.MODE_PRIVATE).getString(
+                String access_token = getActivity().getSharedPreferences(
+                        getString(R.string.shared_pref_file_name),
+                        Context.MODE_PRIVATE
+                ).getString(
                         getString(R.string.access_token_key),
                         getString(R.string.access_token_def_value)
                 );
@@ -82,9 +92,36 @@ public class FriendListFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_friend, menu);
+
+        SearchManager searchManager = (SearchManager)getActivity().getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setIconifiedByDefault(false);
+    }
+
     public void onEvent(FriendListResponse friends)
     {
         swipeLayout.setRefreshing(false);
-        adapter.replaceAll(friends.getResponse());
+        Intent intent = getActivity().getIntent();
+        if(intent != null && Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Log.v("SEARCH", "Query: " + query);
+            ArrayList<Friend> resultList = new ArrayList<>();
+            for(Friend friend: friends.getResponse()) {
+                String name = friend.getName().toLowerCase();
+                String surname = friend.getSurname().toLowerCase();
+                query = query.toLowerCase();
+                if(name.startsWith(query) || surname.startsWith(query)) {
+                    resultList.add(friend);
+                }
+            }
+            adapter.replaceAll(resultList);
+        } else {
+            adapter.replaceAll(friends.getResponse());
+        }
     }
 }

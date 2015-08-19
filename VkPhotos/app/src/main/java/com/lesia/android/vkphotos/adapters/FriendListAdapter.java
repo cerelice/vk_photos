@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.lesia.android.vkphotos.R;
+import com.lesia.android.vkphotos.events.OpenAlbumsFragmentEvent;
 import com.lesia.android.vkphotos.models.Friend;
 import com.lesia.android.vkphotos.view_holders.FriendListItemViewHolder;
-import com.lesia.android.vkphotos.events.OpenAlbumsFragmentEvent;
-import com.lesia.android.vkphotos.R;
 
 import java.util.ArrayList;
 
@@ -51,8 +51,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListItemViewHo
     public int getItemCount() {
         return dataSet.size();
     }
-
-
 
     public void addAll(ArrayList<Friend> newFriends)
     {

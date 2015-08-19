@@ -24,15 +24,34 @@ public class AlbumCardAdapter extends RecyclerView.Adapter<AlbumCardViewHolder>
 {
     private ArrayList<Album> dataSet;
     private Context context;
+    private int layoutMode;
+    public static final int LIST_LAYOUT_MODE = 0;
+    public static final int CARD_LAYOUT_MODE = 1;
 
-    public AlbumCardAdapter(ArrayList<Album> dataSet, Context context) {
+    public AlbumCardAdapter(ArrayList<Album> dataSet, Context context, int layoutMode) {
         this.dataSet = dataSet;
         this.context = context;
+        this.layoutMode = layoutMode;
+    }
+
+    public int getLayoutMode() {
+        return layoutMode;
+    }
+
+    public void setLayoutMode(int layoutMode) {
+        this.layoutMode = layoutMode;
+        notifyAll();
     }
 
     public AlbumCardViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.card_album, viewGroup, false);
+        View v;
+        if(layoutMode == LIST_LAYOUT_MODE) {
+            v = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.list_item_album, viewGroup, false);
+        } else {
+            v = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.card_album, viewGroup, false);
+        }
 
         AlbumCardViewHolder vh = new AlbumCardViewHolder(v);
         return vh;
@@ -79,5 +98,13 @@ public class AlbumCardAdapter extends RecyclerView.Adapter<AlbumCardViewHolder>
         dataSet.clear();
         dataSet.addAll(dataSet.size(), newAlbums);
         notifyDataSetChanged();
+    }
+
+    public ArrayList<Album> getDataSet() {
+        return dataSet;
+    }
+
+    public void setDataSet(ArrayList<Album> dataSet) {
+        this.dataSet = dataSet;
     }
 }

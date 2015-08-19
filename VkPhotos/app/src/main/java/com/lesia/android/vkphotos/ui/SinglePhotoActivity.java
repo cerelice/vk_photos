@@ -1,15 +1,23 @@
 package com.lesia.android.vkphotos.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -32,16 +40,25 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.lesia.android.vkphotos.R;
 import com.lesia.android.vkphotos.events.AddLikeEvent;
 import com.lesia.android.vkphotos.events.DeleteLikeEvent;
 import com.lesia.android.vkphotos.events.LikeCountChangedEvent;
+import com.lesia.android.vkphotos.events.OpenCommentsFragmentEvent;
 import com.lesia.android.vkphotos.events.OpenSinglePhotoFragmentEvent;
 import com.lesia.android.vkphotos.models.Photo;
 import com.lesia.android.vkphotos.models.PhotoListResponse;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
@@ -59,10 +76,22 @@ public class SinglePhotoActivity extends ActionBarActivity {
     private int animation;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-        getSupportActionBar().setElevation(0);
+        //getSupportActionBar().setElevation(0);
         setContentView(R.layout.activity_single_photo);
 
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
@@ -174,10 +203,12 @@ public class SinglePhotoActivity extends ActionBarActivity {
         int mTopDelta;
         float mWidthScale;
         float mHeightScale;
-        private FrameLayout mTopLevelLayout;
+        private RelativeLayout mTopLevelLayout;
         private ColorDrawable mBackground;
         private Button likeButton;
+        private Button commentButton;
         String access_token;
+        String photo_url;
 
         private int mLikesCount;
 
@@ -239,6 +270,17 @@ public class SinglePhotoActivity extends ActionBarActivity {
             Log.v("access_token", access_token);
             final String photo_url = //getArguments().getString(ARG_PHOTO_URL);
                     photo.getPhotoUrl();
+            commentButton = (Button) rootView.findViewById(R.id.commentButton);
+            commentButton.setText("COMMENTS " + photo.getComments().getCount());
+            commentButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new OpenCommentsFragmentEvent(
+                            photo.getOwnerID(),
+                            photo.getId()
+                    ));
+                }
+            });
             likeButton = (Button) rootView.findViewById(R.id.likeButton);
             //if(getArguments().getInt(ARG_IS_LIKED) == 1) {
             if(photo.getLikes().getUserLikes() == 1) {
@@ -279,18 +321,24 @@ public class SinglePhotoActivity extends ActionBarActivity {
                 }
             });
             mBackground = new ColorDrawable(Color.BLACK);
-            mTopLevelLayout = (FrameLayout) rootView.findViewById(R.id.topLevelLayout);
+            mTopLevelLayout = (RelativeLayout) rootView.findViewById(R.id.topLevelLayout);
             mTopLevelLayout.setBackgroundDrawable(mBackground);
-            Glide.with(this).load(photo_url).into(singlePhotoImageView);
             Log.v("ANIMATE", "Animate? " + getArguments().getInt(ARG_ANIMATION));
             if(getArguments().getInt(ARG_ANIMATION) == CREATE_ANIMATION) {
+                Drawable dw = EventBus.getDefault().getStickyEvent(GlideBitmapDrawable.class);
+                if(dw == null) {
+                    Log.v("DRAWABLE", "NULL DRAWABLE AFTER STICKY EVENT");
+                } else {
+                    Log.v("DRAWABLE", "DRAWABLE AFTER STICKY EVENT IS OK");
+                }
+                singlePhotoImageView.setImageDrawable(dw);
+                EventBus.getDefault().removeStickyEvent(GlideBitmapDrawable.class);
                 Log.v("ANIMATE", "animate " + photo_url);
                 ViewTreeObserver observer = singlePhotoImageView.getViewTreeObserver();
                 observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                     @Override
                     public boolean onPreDraw() {
                         singlePhotoImageView.getViewTreeObserver().removeOnPreDrawListener(this);
-
                         int[] screenLocation = new int[2];
                         singlePhotoImageView.getLocationOnScreen(screenLocation);
                         int thumbLeft = getArguments().getInt(OpenSinglePhotoFragmentEvent.LEFT_LOCATION_TAG);
@@ -302,18 +350,18 @@ public class SinglePhotoActivity extends ActionBarActivity {
                         mTopDelta = thumbTop - screenLocation[1];
 
                         Log.v("ANIMATION",  "getWidth = " + singlePhotoImageView.getWidth() + "\n" +
-                                            "getHeight = " + singlePhotoImageView.getHeight()
+                                            "getHeight = " + singlePhotoImageView.getHeight() + "\n"
                         );
-
                         mWidthScale = ((float) thumbWidth) / ((float) singlePhotoImageView.getWidth());
                         //mHeightScale = ((float) thumbHeight) / ((float) singlePhotoImageView.getHeight());
-
                         runEnterAnimation();
-
                         return true;
                     }
                 });
+            } else {
+                Glide.with(this).load(photo_url).into(singlePhotoImageView);
             }
+            setHasOptionsMenu(true);
             return rootView;
         }
 
@@ -365,10 +413,10 @@ public class SinglePhotoActivity extends ActionBarActivity {
         private void runEnterAnimation() {
             long duration = 500;
 
-            Log.v("ANIMATION",  "setScaleX = " + mWidthScale + '\n' +
-                                "setScaleY = " + mHeightScale + '\n' +
-                                "setTranslationX = " + mLeftDelta + '\n' +
-                                "setTranslationY = " + mTopDelta
+            Log.v("ANIMATION", "setScaleX = " + mWidthScale + '\n' +
+                            "setScaleY = " + mHeightScale + '\n' +
+                            "setTranslationX = " + mLeftDelta + '\n' +
+                            "setTranslationY = " + mTopDelta
             );
 
             singlePhotoImageView.setPivotX(0.5f);
@@ -381,7 +429,26 @@ public class SinglePhotoActivity extends ActionBarActivity {
             singlePhotoImageView.animate().setDuration(duration).
                     scaleX(1).scaleY(1).
                     translationX(0).translationY(0).
-                    setInterpolator(sDecelerator);
+                    setInterpolator(sDecelerator).
+                    setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            Glide.with(getActivity())
+                                    .load(photo.getPhotoUrl()).dontAnimate()
+                                    .into(new GlideDrawableImageViewTarget(singlePhotoImageView) {
+                                        @Override
+                                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                                            super.onResourceReady(resource, animation);
+                                            if(mShareActionProvider != null) {
+                                                mShareActionProvider.setShareIntent(createShareIntent());
+                                            }
+                                            else {
+                                                Log.d("SHARE", "Share Action Provider is null");
+                                            }
+                                        }
+                                    });
+                        }
+                    });
 
             ObjectAnimator bgAnim = ObjectAnimator.ofInt(mBackground, "alpha", 0, 255);
             bgAnim.setDuration(duration);
@@ -392,22 +459,45 @@ public class SinglePhotoActivity extends ActionBarActivity {
         private Intent createShareIntent()
         {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("text/plain");
-            //Bitmap photo = ((BitmapDrawable)singlePhotoImageView.getDrawable()).getBitmap();
+            //shareIntent.setType("text/plain");
+            shareIntent.setType("image/jpeg");
+            Bitmap photo = null;
+            Drawable dw = (Drawable) singlePhotoImageView.getDrawable();
+            if(dw instanceof GlideBitmapDrawable) {
+                photo = ((GlideBitmapDrawable)dw).getBitmap();
+                Log.v("PHOTO", "GlideBitmapDrawable");
+                Log.v("PHOTO", photo.toString());
+            } else
+                if(dw instanceof BitmapDrawable) {
+                    photo = ((BitmapDrawable)dw).getBitmap();
+                    Log.v("PHOTO", "BitmapDrawable");
+                }
+                else {
+                    photo = null;
+                    Log.v("PHOTO", "There is no photo");
+                    return null;
+                }
 
-            //shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, MESSAGE_TEXT + getArguments().getString(ARG_PHOTO_URL));
+            String path = MediaStore.Images.Media.insertImage(
+                    getActivity().getContentResolver(),
+                    photo,
+                    MESSAGE_TEXT + getArguments().getString(ARG_PHOTO_URL),
+                    null
+            );
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
+            //shareIntent.putExtra(Intent.EXTRA_TEXT, MESSAGE_TEXT + getArguments().getString(ARG_PHOTO_URL));
 
             return shareIntent;
         }
+
+        ShareActionProvider mShareActionProvider;
 
         @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
             inflater.inflate(R.menu.menu_single_photo_fragment, menu);
 
             MenuItem menuItem = menu.findItem(R.id.action_share);
-
-            ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+            mShareActionProvider = (ShareActionProvider)MenuItemCompat.getActionProvider(menuItem);
             if(mShareActionProvider != null) {
                 mShareActionProvider.setShareIntent(createShareIntent());
             }
@@ -415,6 +505,91 @@ public class SinglePhotoActivity extends ActionBarActivity {
                 Log.d("SHARE", "Share Action Provider is null");
             }
         }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            // Handle action bar item clicks here. The action bar will
+            // automatically handle clicks on the Home/Up button, so long
+            // as you specify a parent activity in AndroidManifest.xml.
+            int id = item.getItemId();
+
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.action_download) {
+                Bitmap photo = null;
+                Drawable dw = (Drawable) singlePhotoImageView.getDrawable();
+                if(dw instanceof GlideBitmapDrawable) {
+                    photo = ((GlideBitmapDrawable)dw).getBitmap();
+                    Log.v("PHOTO", "GlideBitmapDrawable");
+                    Log.v("PHOTO", photo.toString());
+                } else
+                if(dw instanceof BitmapDrawable) {
+                    photo = ((BitmapDrawable)dw).getBitmap();
+                    Log.v("PHOTO", "BitmapDrawable");
+                }
+                else {
+                    photo = null;
+                    Log.v("PHOTO", "There is no photo");
+                    return false;
+                }
+                FileOutputStream out = null;
+                String path = Environment.getExternalStorageDirectory().toString();
+                File photo_file = new File(path, "vkphotos" + photo.getGenerationId() + ".jpg");
+                ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                try {
+                    progressDialog.setMessage("Завантаження файлу...");
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.show();
+                    out = new FileOutputStream(photo_file);
+                    photo.compress(Bitmap.CompressFormat.JPEG, 85, out);
+
+                } catch(Exception e) {
+                    Log.e("FILE_OUTPUT", "Error: " + e.getMessage());
+                } finally {
+                    try {
+                        if(out != null) {
+                            progressDialog.dismiss();
+                            out.close();
+                        }
+                        out.flush();
+                    } catch (IOException e) {
+                        Log.e("FILE_OUTPUT", "Error: " + e.getMessage());
+                    }
+                }
+                /*
+                MediaStore.Images.Media.insertImage(
+                        getActivity().getContentResolver(),
+                        photo,
+                        "VKPhoto" + photo.getGenerationId() + ".jpg",
+                        "VKPhoto" + photo.getGenerationId() + ".jpg"
+                );
+                */
+                return true;
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
     }
 
+    public void onEvent(OpenCommentsFragmentEvent event) {
+        Bundle bundle = new Bundle();
+        bundle.putString("OWNER_ID", event.getOwnerID());
+        bundle.putString("PHOTO_ID", event.getPhotoID());
+
+
+        CommentsFragment fragment = new CommentsFragment();
+        fragment.setArguments(bundle);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.single_photo_container, fragment, fragment.getClass().getSimpleName())
+                .addToBackStack(fragment.getClass().getSimpleName())
+                .commit();
+
+
+        /*
+        Intent intent = new Intent(this, CommentActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
+        */
+    }
 }

@@ -1,6 +1,7 @@
 package com.lesia.android.vkphotos.rest_utils;
 
 import com.lesia.android.vkphotos.models.AlbumsResponse;
+import com.lesia.android.vkphotos.models.CommentListResponse;
 import com.lesia.android.vkphotos.models.FriendListResponse;
 import com.lesia.android.vkphotos.models.LikeResponse;
 import com.lesia.android.vkphotos.models.PhotoListResponse;
@@ -12,10 +13,16 @@ import retrofit.http.Query;
 
 public interface IVkApi
 {
-    @GET("/friends.get?order=hints&fields=photo_50")
+    @GET("/friends.get?order=hints&fields=photo_100")
     public void getFriendsList(
             @Query("access_token") String access_token,
             Callback<FriendListResponse> friendList
+    );
+
+    @GET("/users.get?fields=photo_100")
+    public void getUserInfo(
+            @Query("user_ids") String user_ids,
+            Callback<FriendListResponse> userList
     );
 
     @GET("/photos.get?rev=1&extended=1")
@@ -24,6 +31,14 @@ public interface IVkApi
             @Query("album_id") String album_id,
             @Query("access_token") String access_token,
             Callback<PhotoListResponse> photoList
+    );
+
+    @GET("/photos.getComments?v=5.35")
+    public void getComments(
+            @Query("owner_id") String owner_id,
+            @Query("photo_id") String photo_id,
+            @Query("access_token") String access_token,
+            Callback<CommentListResponse> photoList
     );
 
     @GET("/likes.add?type=photo")

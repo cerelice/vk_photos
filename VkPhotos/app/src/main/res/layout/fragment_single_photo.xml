@@ -1,24 +1,52 @@
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/topLevelLayout"
-    tools:context="com.lesia.android.vkphotos.ui.SinglePhotoActivity$PlaceholderFragment">
+    tools:context="com.lesia.android.vkphotos.ui.SinglePhotoActivity$PlaceholderFragment"
+    android:orientation="vertical">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/singlePhotoImageView"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:layout_above="@+id/photoButtonsPanel"
+        android:layout_alignParentTop="true" />
 
-    <Button
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="LIKE"
-        android:id="@+id/likeButton"
+        android:gravity="bottom"
         android:layout_gravity="center_horizontal|bottom"
-        android:background="@drawable/like_button_background"
-        android:textColor="#FFF" />
+        android:weightSum="2"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:id="@+id/photoButtonsPanel">
 
-</FrameLayout>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LIKE"
+            android:id="@+id/likeButton"
+            android:layout_gravity="center_horizontal|bottom"
+            android:background="@drawable/like_button_background"
+            android:textColor="#FFF"
+            android:layout_weight="1" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="COMMENTS"
+            android:id="@+id/commentButton"
+            android:layout_weight="1"
+            android:background="@drawable/like_button_background"
+            android:textColor="#fff" />
+    </LinearLayout>
+
+</RelativeLayout>

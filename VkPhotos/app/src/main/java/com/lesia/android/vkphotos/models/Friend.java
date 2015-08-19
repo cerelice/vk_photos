@@ -11,7 +11,7 @@ public class Friend
     private String mName;
     @SerializedName("last_name")
     private String mSurname;
-    @SerializedName("photo_50")
+    @SerializedName("photo_100")
     private String mPhotoUrl;
     @SerializedName("uid")
     private String mID;

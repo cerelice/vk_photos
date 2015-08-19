@@ -19,6 +19,8 @@ public class Photo implements Serializable
     private String albumID;
     @SerializedName("likes")
     private Likes likes;
+    @SerializedName("comments")
+    private Comments comments;
 
     public static class Likes implements Serializable
     {
@@ -50,6 +52,33 @@ public class Photo implements Serializable
                     ", count=" + count +
                     '}';
         }
+    }
+
+    public static class Comments implements Serializable {
+        private int count;
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+
+        @Override
+        public String toString() {
+            return "Comments{" +
+                    "count=" + count +
+                    '}';
+        }
+    }
+
+    public Comments getComments() {
+        return comments;
+    }
+
+    public void setComments(Comments comments) {
+        this.comments = comments;
     }
 
     public Likes getLikes() {

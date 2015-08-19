@@ -6,8 +6,12 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -40,6 +44,7 @@ public class AlbumPhotoFragment extends Fragment {
 
     public AlbumPhotoFragment() {
         // Required empty public constructor
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -86,6 +91,30 @@ public class AlbumPhotoFragment extends Fragment {
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_photos, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_switch:
+                if(item.getTitle().equals("Change to list")) {
+                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+                    recyclerView.setLayoutManager(layoutManager);
+                    item.setTitle("Change to grid");
+                    return true;
+                } else {
+                    RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
+                    recyclerView.setLayoutManager(layoutManager);
+                    item.setTitle("Change to list");
+                    return true;
+                }
+        }
+        return false;
     }
 
     public void onEvent(PhotoListResponse photos)

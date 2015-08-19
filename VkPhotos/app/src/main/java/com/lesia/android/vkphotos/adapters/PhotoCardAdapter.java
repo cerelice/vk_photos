@@ -2,6 +2,7 @@ package com.lesia.android.vkphotos.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,12 @@ public class PhotoCardAdapter extends RecyclerView.Adapter<PhotoCardViewHolder>
                 int[] screenLocation = new int[2];
                 viewHolder.mPhoto.getLocationOnScreen(screenLocation);
                 int orientation = context.getResources().getConfiguration().orientation;
+                if(viewHolder.mPhoto.getDrawable() == null) {
+                    Log.v("DRAWABLE", "NULL DRAWABLE ON PHOTO_CARD_ADAPTER");
+                } else {
+                    Log.v("DRAWABLE", "DRAWABLE ON PHOTO_CARD_ADAPTER IS OK");
+                }
+                EventBus.getDefault().postSticky(viewHolder.mPhoto.getDrawable());
                 EventBus.getDefault().post(
                         new OpenSinglePhotoFragmentEvent(
                                 new PhotoListResponse(dataSet),

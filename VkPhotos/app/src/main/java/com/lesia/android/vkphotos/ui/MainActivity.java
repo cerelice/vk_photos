@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.support.v7.widget.Toolbar;
 
 import com.lesia.android.vkphotos.R;
 import com.lesia.android.vkphotos.events.AuthEvent;
@@ -23,6 +24,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar mActionBarToolbar = (Toolbar)findViewById(R.id.actionbar_friend);
+        setSupportActionBar(mActionBarToolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
 
         String pref_access_token = getSharedPreferences(
@@ -138,6 +141,7 @@ public class MainActivity extends ActionBarActivity {
         bundle.putInt(OpenSinglePhotoFragmentEvent.TOP_LOCATION_TAG, event.getTopLocation());
         bundle.putInt(OpenSinglePhotoFragmentEvent.WIDTH_TAG, event.getWidth());
         bundle.putInt(OpenSinglePhotoFragmentEvent.HEIGHT_TAG, event.getHeight());
+
         intent.putExtras(bundle);
 
         startActivity(intent);
@@ -149,4 +153,6 @@ public class MainActivity extends ActionBarActivity {
     {
         getSupportActionBar().setDisplayHomeAsUpEnabled(b);
     }
+
+
 }
