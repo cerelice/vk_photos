@@ -40,7 +40,9 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
@@ -206,10 +208,12 @@ public class SinglePhotoActivity extends ActionBarActivity {
         float mHeightScale;
         private RelativeLayout mTopLevelLayout;
         private ColorDrawable mBackground;
-        private Button likeButton;
+        private LinearLayout likeButton;
         private Button commentButton;
         String access_token;
         String photo_url;
+        private ImageView likeButtonImageView;
+        private TextView likeButtonTextView;
 
         private int mLikesCount;
 
@@ -290,12 +294,13 @@ public class SinglePhotoActivity extends ActionBarActivity {
                     ));
                 }
             });
-            likeButton = (Button) rootView.findViewById(R.id.likeButton);
+            likeButton = (LinearLayout) rootView.findViewById(R.id.likeButton);
+            likeButtonImageView = (ImageView)rootView.findViewById(R.id.likeButtonImageView);
+            likeButtonTextView = (TextView)rootView.findViewById(R.id.likeButtonTextView);
             //if(getArguments().getInt(ARG_IS_LIKED) == 1) {
             if(photo.getLikes().getUserLikes() == 1) {
-                likeButton.setText("LIKED " + //getArguments().getInt(ARG_LIKES));
-                        mLikesCount);
-                likeButton.setBackgroundColor(Color.BLUE);
+                likeButtonTextView.setText("" + mLikesCount);
+                likeButtonImageView.setImageDrawable(getResources().getDrawable(R.mipmap.heart));
                 likeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -307,9 +312,8 @@ public class SinglePhotoActivity extends ActionBarActivity {
                     }
                 });
             } else {
-                likeButton.setText("LIKE " + //getArguments().getInt(ARG_LIKES));
-                        mLikesCount);
-                likeButton.setBackgroundColor(Color.BLACK);
+                likeButtonTextView.setText("" + mLikesCount);
+                likeButtonImageView.setImageDrawable(getResources().getDrawable(R.mipmap.heartoutline));
                 likeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -382,8 +386,8 @@ public class SinglePhotoActivity extends ActionBarActivity {
             mLikesCount = event.getLikesCount();
             Log.v("LikeCountChangedEvent", "likes: " + event.toString());
             if(event.getAction() == LikeCountChangedEvent.ADD_LIKE) {
-                likeButton.setText("LIKED " + mLikesCount);
-                likeButton.setBackgroundColor(Color.BLUE);
+                likeButtonTextView.setText("" + mLikesCount);
+                likeButtonImageView.setImageDrawable(getResources().getDrawable(R.mipmap.heart));
 
                 Photo.Likes likes = new Photo.Likes();
                 likes.setCount(mLikesCount);
@@ -402,8 +406,8 @@ public class SinglePhotoActivity extends ActionBarActivity {
                 });
             }
             if(event.getAction() == LikeCountChangedEvent.DELETE_LIKE) {
-                likeButton.setText("LIKE " + mLikesCount);
-                likeButton.setBackgroundColor(Color.BLACK);
+                likeButtonTextView.setText("" + mLikesCount);
+                likeButtonImageView.setImageDrawable(getResources().getDrawable(R.mipmap.heartoutline));
 
                 Photo.Likes likes = new Photo.Likes();
                 likes.setCount(mLikesCount);
