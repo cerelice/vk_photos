@@ -29,15 +29,34 @@
         android:layout_alignParentRight="true"
         android:id="@+id/photoButtonsPanel">
 
-        <Button
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="LIKE"
+            android:layout_height="match_parent"
             android:id="@+id/likeButton"
             android:layout_gravity="center_horizontal|bottom"
             android:background="@drawable/like_button_background"
             android:textColor="#FFF"
-            android:layout_weight="1" />
+            android:layout_weight="1" >
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:src="@mipmap/heartoutline"
+                android:id="@+id/likeButtonImageView"
+                android:layout_marginLeft="72dp"
+                android:layout_marginRight="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/likeButtonTextView"
+                android:layout_gravity="center"
+                android:textColor="#fff"
+                android:textSize="20sp" />
+        </LinearLayout>
 
         <Button
             android:layout_width="match_parent"
@@ -47,6 +66,7 @@
             android:layout_weight="1"
             android:background="@drawable/like_button_background"
             android:textColor="#fff" />
+
     </LinearLayout>
 
 </RelativeLayout>

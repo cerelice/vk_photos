@@ -100,7 +100,7 @@ public class FriendListFragment extends Fragment {
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-        searchView.setIconifiedByDefault(false);
+        searchView.setIconifiedByDefault(true);
     }
 
     public void onEvent(FriendListResponse friends)
