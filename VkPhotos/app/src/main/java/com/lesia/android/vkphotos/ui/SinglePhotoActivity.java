@@ -195,6 +195,7 @@ public class SinglePhotoActivity extends ActionBarActivity {
         private static final String ARG_ANIMATION = "animation";
         private static final String ARG_LIKES = "likes";
         private static final String ARG_IS_LIKED = "is_liked";
+        ShareActionProvider mShareActionProvider;
         private ImageView singlePhotoImageView;
         private Photo photo;
         private Uri uri;
@@ -252,24 +253,32 @@ public class SinglePhotoActivity extends ActionBarActivity {
             setHasOptionsMenu(true);
         }
 
+        private String getAccessToken() {
+            return getActivity().getSharedPreferences(
+                        getString(R.string.shared_pref_file_name),
+                        Context.MODE_PRIVATE)
+                    .getString(
+                        getString(R.string.access_token_key),
+                        getString(R.string.access_token_def_value)
+                    );
+        }
+
+        private void like() {
+
+        }
+
+        private void dislike() {
+
+        }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_single_photo, container, false);
-
             photo = (Photo) getArguments().getSerializable(ARG_PHOTO);
             mLikesCount = photo.getLikes().getCount();
-            access_token = getActivity().getSharedPreferences(
-                    getString(R.string.shared_pref_file_name),
-                    Context.MODE_PRIVATE
-            )
-                    .getString(
-                            getString(R.string.access_token_key),
-                            getString(R.string.access_token_def_value)
-                    );
-            Log.v("access_token", access_token);
-            final String photo_url = //getArguments().getString(ARG_PHOTO_URL);
-                    photo.getPhotoUrl();
+            access_token = getAccessToken();
+            final String photo_url = photo.getPhotoUrl();
             commentButton = (Button) rootView.findViewById(R.id.commentButton);
             commentButton.setText("COMMENTS " + photo.getComments().getCount());
             commentButton.setOnClickListener(new View.OnClickListener() {
@@ -363,6 +372,10 @@ public class SinglePhotoActivity extends ActionBarActivity {
             }
             setHasOptionsMenu(true);
             return rootView;
+        }
+
+        private void setLiked() {
+
         }
 
         public void onEvent(LikeCountChangedEvent event) {
@@ -459,23 +472,17 @@ public class SinglePhotoActivity extends ActionBarActivity {
         private Intent createShareIntent()
         {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            //shareIntent.setType("text/plain");
             shareIntent.setType("image/jpeg");
-            Bitmap photo = null;
+            Bitmap photo;
             Drawable dw = (Drawable) singlePhotoImageView.getDrawable();
             if(dw instanceof GlideBitmapDrawable) {
                 photo = ((GlideBitmapDrawable)dw).getBitmap();
-                Log.v("PHOTO", "GlideBitmapDrawable");
-                Log.v("PHOTO", photo.toString());
             } else
                 if(dw instanceof BitmapDrawable) {
                     photo = ((BitmapDrawable)dw).getBitmap();
-                    Log.v("PHOTO", "BitmapDrawable");
                 }
                 else {
-                    photo = null;
-                    Log.v("PHOTO", "There is no photo");
-                    return null;
+                    return shareIntent;
                 }
 
             String path = MediaStore.Images.Media.insertImage(
@@ -485,12 +492,8 @@ public class SinglePhotoActivity extends ActionBarActivity {
                     null
             );
             shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
-            //shareIntent.putExtra(Intent.EXTRA_TEXT, MESSAGE_TEXT + getArguments().getString(ARG_PHOTO_URL));
-
             return shareIntent;
         }
-
-        ShareActionProvider mShareActionProvider;
 
         @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -575,7 +578,6 @@ public class SinglePhotoActivity extends ActionBarActivity {
         bundle.putString("OWNER_ID", event.getOwnerID());
         bundle.putString("PHOTO_ID", event.getPhotoID());
 
-
         CommentsFragment fragment = new CommentsFragment();
         fragment.setArguments(bundle);
 
@@ -584,12 +586,5 @@ public class SinglePhotoActivity extends ActionBarActivity {
                 .add(R.id.single_photo_container, fragment, fragment.getClass().getSimpleName())
                 .addToBackStack(fragment.getClass().getSimpleName())
                 .commit();
-
-
-        /*
-        Intent intent = new Intent(this, CommentActivity.class);
-        intent.putExtras(bundle);
-        startActivity(intent);
-        */
     }
 }
