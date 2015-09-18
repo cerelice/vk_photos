@@ -5,12 +5,17 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -18,6 +23,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -26,11 +32,14 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.Toolbar;
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -43,13 +52,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.lesia.android.vkphotos.R;
+import com.lesia.android.vkphotos.elements.TouchImageView;
 import com.lesia.android.vkphotos.events.AddLikeEvent;
 import com.lesia.android.vkphotos.events.DeleteLikeEvent;
 import com.lesia.android.vkphotos.events.LikeCountChangedEvent;
@@ -62,6 +74,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import de.greenrobot.event.EventBus;
 
@@ -93,8 +106,16 @@ public class SinglePhotoActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-        //getSupportActionBar().setElevation(0);
         setContentView(R.layout.activity_single_photo);
+        //getSupportActionBar().setElevation(0);
+        Toolbar mActionBarToolbar = (Toolbar)findViewById(R.id.actionbar_photo);
+        setSupportActionBar(mActionBarToolbar);
+        //supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if(getSupportActionBar() == null) {
+            Log.v("ACTIONBAR", "getSupportActionBar IS NULL");
+        }
 
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -104,9 +125,6 @@ public class SinglePhotoActivity extends ActionBarActivity {
                 OpenSinglePhotoFragmentEvent.ORIENTATION_TAG,
                 Configuration.ORIENTATION_LANDSCAPE
         );
-
-        //mBackground = new ColorDrawable(Color.BLACK);
-        //mTopLevelLayout.setBackgroundColor(Color.BLACK);
 
         int position = getIntent().getIntExtra(OpenSinglePhotoFragmentEvent.POSITION_TAG, 0);
         mViewPager.setCurrentItem(position);
@@ -120,6 +138,7 @@ public class SinglePhotoActivity extends ActionBarActivity {
 
     public boolean isActionBarVisible() {
         return getSupportActionBar().isShowing();
+        //return getActionBar().isShowing();
     }
 
     public void setActionBarVisibility(boolean b) {
@@ -143,11 +162,6 @@ public class SinglePhotoActivity extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -198,7 +212,7 @@ public class SinglePhotoActivity extends ActionBarActivity {
         private static final String ARG_LIKES = "likes";
         private static final String ARG_IS_LIKED = "is_liked";
         ShareActionProvider mShareActionProvider;
-        private ImageView singlePhotoImageView;
+        private TouchImageView singlePhotoImageView;
         private Photo photo;
         private Uri uri;
         private static final String MESSAGE_TEXT = "Checkout this photo! ";
@@ -208,10 +222,8 @@ public class SinglePhotoActivity extends ActionBarActivity {
         float mHeightScale;
         private RelativeLayout mTopLevelLayout;
         private ColorDrawable mBackground;
-        private LinearLayout likeButton;
-        private Button commentButton;
+        private FrameLayout likeButton;
         String access_token;
-        String photo_url;
         private ImageView likeButtonImageView;
         private TextView likeButtonTextView;
 
@@ -283,18 +295,8 @@ public class SinglePhotoActivity extends ActionBarActivity {
             mLikesCount = photo.getLikes().getCount();
             access_token = getAccessToken();
             final String photo_url = photo.getPhotoUrl();
-            commentButton = (Button) rootView.findViewById(R.id.commentButton);
-            commentButton.setText("COMMENTS " + photo.getComments().getCount());
-            commentButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    EventBus.getDefault().post(new OpenCommentsFragmentEvent(
-                            photo.getOwnerID(),
-                            photo.getId()
-                    ));
-                }
-            });
-            likeButton = (LinearLayout) rootView.findViewById(R.id.likeButton);
+
+            likeButton = (FrameLayout) rootView.findViewById(R.id.likeButton);
             likeButtonImageView = (ImageView)rootView.findViewById(R.id.likeButtonImageView);
             likeButtonTextView = (TextView)rootView.findViewById(R.id.likeButtonTextView);
             //if(getArguments().getInt(ARG_IS_LIKED) == 1) {
@@ -325,7 +327,7 @@ public class SinglePhotoActivity extends ActionBarActivity {
                     }
                 });
             }
-            singlePhotoImageView = (ImageView) rootView.findViewById(R.id.singlePhotoImageView);
+            singlePhotoImageView = (TouchImageView) rootView.findViewById(R.id.singlePhotoImageView);
             singlePhotoImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -372,7 +374,12 @@ public class SinglePhotoActivity extends ActionBarActivity {
                     }
                 });
             } else {
-                Glide.with(this).load(photo_url).into(singlePhotoImageView);
+                Glide.with(this).load(photo_url).asBitmap().into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        singlePhotoImageView.setImageBitmap(resource);
+                    }
+                });
             }
             setHasOptionsMenu(true);
             return rootView;
@@ -382,6 +389,13 @@ public class SinglePhotoActivity extends ActionBarActivity {
 
         }
 
+        private void setNewLikes(int likesCount, int action) {
+            Photo.Likes likes = new Photo.Likes();
+            likes.setCount(mLikesCount);
+            likes.setUserLikes(action);
+            photo.setLikes(likes);
+        }
+
         public void onEvent(LikeCountChangedEvent event) {
             mLikesCount = event.getLikesCount();
             Log.v("LikeCountChangedEvent", "likes: " + event.toString());
@@ -389,10 +403,7 @@ public class SinglePhotoActivity extends ActionBarActivity {
                 likeButtonTextView.setText("" + mLikesCount);
                 likeButtonImageView.setImageDrawable(getResources().getDrawable(R.mipmap.heart));
 
-                Photo.Likes likes = new Photo.Likes();
-                likes.setCount(mLikesCount);
-                likes.setUserLikes(event.getAction());
-                photo.setLikes(likes);
+                setNewLikes(mLikesCount, event.getAction());
 
                 likeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -409,10 +420,7 @@ public class SinglePhotoActivity extends ActionBarActivity {
                 likeButtonTextView.setText("" + mLikesCount);
                 likeButtonImageView.setImageDrawable(getResources().getDrawable(R.mipmap.heartoutline));
 
-                Photo.Likes likes = new Photo.Likes();
-                likes.setCount(mLikesCount);
-                likes.setUserLikes(event.getAction());
-                photo.setLikes(likes);
+                setNewLikes(mLikesCount, event.getAction());
 
                 likeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -540,12 +548,10 @@ public class SinglePhotoActivity extends ActionBarActivity {
                 }
                 FileOutputStream out = null;
                 String path = Environment.getExternalStorageDirectory().toString();
-                File photo_file = new File(path, "vkphotos" + photo.getGenerationId() + ".jpg");
-                ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                final String file_name = "vkphotos" + System.currentTimeMillis() + ".jpg";
+                final File photo_file = new File(path, file_name);
+                //ProgressDialog progressDialog = new ProgressDialog(getActivity());
                 try {
-                    progressDialog.setMessage("Завантаження файлу...");
-                    progressDialog.setIndeterminate(true);
-                    progressDialog.show();
                     out = new FileOutputStream(photo_file);
                     photo.compress(Bitmap.CompressFormat.JPEG, 85, out);
 
@@ -554,7 +560,25 @@ public class SinglePhotoActivity extends ActionBarActivity {
                 } finally {
                     try {
                         if(out != null) {
-                            progressDialog.dismiss();
+                            //progressDialog.dismiss();
+                            AlertDialog.Builder alertDialogBuilder = null;
+                            alertDialogBuilder = new AlertDialog.Builder(getActivity())
+                            .setTitle("Image was downloaded")
+                            .setPositiveButton("Open", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent intent = new Intent();
+                                    intent.setAction(Intent.ACTION_VIEW);
+                                    intent.setDataAndType(Uri.parse("file://" + photo_file.getAbsolutePath()), "image/*");
+                                    startActivity(intent);
+                                }
+                            })
+                                    .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //alertDialogBuilder.cancel();
+                                        }
+                                    })
+                            .setCancelable(true);
+                            alertDialogBuilder.show();
                             out.close();
                         }
                         out.flush();
@@ -562,33 +586,10 @@ public class SinglePhotoActivity extends ActionBarActivity {
                         Log.e("FILE_OUTPUT", "Error: " + e.getMessage());
                     }
                 }
-                /*
-                MediaStore.Images.Media.insertImage(
-                        getActivity().getContentResolver(),
-                        photo,
-                        "VKPhoto" + photo.getGenerationId() + ".jpg",
-                        "VKPhoto" + photo.getGenerationId() + ".jpg"
-                );
-                */
                 return true;
             }
 
             return super.onOptionsItemSelected(item);
         }
-    }
-
-    public void onEvent(OpenCommentsFragmentEvent event) {
-        Bundle bundle = new Bundle();
-        bundle.putString("OWNER_ID", event.getOwnerID());
-        bundle.putString("PHOTO_ID", event.getPhotoID());
-
-        CommentsFragment fragment = new CommentsFragment();
-        fragment.setArguments(bundle);
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.single_photo_container, fragment, fragment.getClass().getSimpleName())
-                .addToBackStack(fragment.getClass().getSimpleName())
-                .commit();
     }
 }

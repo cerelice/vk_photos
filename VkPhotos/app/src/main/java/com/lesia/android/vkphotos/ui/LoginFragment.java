@@ -25,7 +25,9 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         WebView webView = new WebView(getActivity());
+        webView.clearCache(true);
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -33,7 +35,7 @@ public class LoginFragment extends Fragment {
                 final String EXPIRES_IN = "expires_in";
                 final String USER_ID = "user_id";
 
-                if(url.contains(ACCESS_TOKEN)) {
+                if (url.contains(ACCESS_TOKEN)) {
                     url = url.replace('#', '?');
                     Uri uri = Uri.parse(url);
                     Log.v("URI", url);
@@ -66,8 +68,8 @@ public class LoginFragment extends Fragment {
                                     getString(R.string.expires_in_def_value))
                     );
                     Log.v("USER_ID", sharedPreferences.getString(
-                                            getString(R.string.user_id_key),
-                                            getString(R.string.user_id_def_value))
+                                    getString(R.string.user_id_key),
+                                    getString(R.string.user_id_def_value))
                     );
                     EventBus.getDefault().post(new AuthEvent());
                     return true;

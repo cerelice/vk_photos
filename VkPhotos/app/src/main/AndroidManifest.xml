@@ -36,14 +36,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.lesia.android.vkphotos.ui.MainActivity" />
         </activity>
-        <activity
-            android:name=".ui.CommentActivity"
-            android:label="@string/title_activity_comment"
-            android:parentActivityName=".ui.SinglePhotoActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.lesia.android.vkphotos.ui.SinglePhotoActivity" />
-        </activity>
     </application>
 
 </manifest>

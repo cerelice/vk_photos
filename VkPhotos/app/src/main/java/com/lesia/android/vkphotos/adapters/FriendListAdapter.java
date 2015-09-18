@@ -1,12 +1,16 @@
 package com.lesia.android.vkphotos.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.lesia.android.vkphotos.R;
 import com.lesia.android.vkphotos.events.OpenAlbumsFragmentEvent;
 import com.lesia.android.vkphotos.models.Friend;
@@ -37,7 +41,15 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListItemViewHo
     @Override
     public void onBindViewHolder(final FriendListItemViewHolder viewHolder, final int position) {
         viewHolder.mName.setText(dataSet.get(position).getFullName());
-        Glide.with(context).load(dataSet.get(position).getPhotoUrl()).into(viewHolder.mPhoto);
+        Glide.with(context).load(dataSet.get(position).getPhotoUrl()).asBitmap().centerCrop().into(new BitmapImageViewTarget(viewHolder.mPhoto) {
+            @Override
+            protected void setResource(Bitmap resource) {
+                RoundedBitmapDrawable circularBitmapDrawable =
+                        RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                circularBitmapDrawable.setCornerRadius(Math.max(resource.getWidth(), resource.getHeight()) / 2.0f);
+                viewHolder.mPhoto.setImageDrawable(circularBitmapDrawable);
+            }
+        });
         viewHolder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

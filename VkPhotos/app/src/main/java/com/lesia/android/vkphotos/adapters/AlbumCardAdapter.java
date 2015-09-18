@@ -1,12 +1,16 @@
 package com.lesia.android.vkphotos.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.lesia.android.vkphotos.R;
 import com.lesia.android.vkphotos.events.OpenPhotosFromAlbumEvent;
 import com.lesia.android.vkphotos.models.Album;
@@ -58,7 +62,7 @@ public class AlbumCardAdapter extends RecyclerView.Adapter<AlbumCardViewHolder>
     }
 
     @Override
-    public void onBindViewHolder(AlbumCardViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(final AlbumCardViewHolder viewHolder, final int position) {
         viewHolder.mName.setText(dataSet.get(position).getName());
 
         viewHolder.rootView.setOnClickListener(new View.OnClickListener() {
@@ -79,7 +83,19 @@ public class AlbumCardAdapter extends RecyclerView.Adapter<AlbumCardViewHolder>
                 break;
             }
         }
-        Glide.with(context).load(photo_url).centerCrop().into(viewHolder.mCoverPhoto);
+        if(layoutMode == LIST_LAYOUT_MODE) {
+            Glide.with(context).load(photo_url).asBitmap().centerCrop().into(new BitmapImageViewTarget(viewHolder.mCoverPhoto) {
+                @Override
+                protected void setResource(Bitmap resource) {
+                    RoundedBitmapDrawable circularBitmapDrawable =
+                            RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                    circularBitmapDrawable.setCornerRadius(Math.max(resource.getWidth(), resource.getHeight()) / 2.0f);
+                    viewHolder.mCoverPhoto.setImageDrawable(circularBitmapDrawable);
+                }
+            });
+        } else {
+            Glide.with(context).load(photo_url).centerCrop().into(viewHolder.mCoverPhoto);
+        }
     }
 
     @Override
